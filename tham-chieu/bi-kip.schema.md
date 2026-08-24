@@ -1,6 +1,6 @@
 # Quy cách bí kíp
 
-**schema: 1** · Đi kèm `VAN-DAO-dac-ta-v1.0.md` · Vị trí trong plugin: `tham-chieu/bi-kip.schema.md`
+**schema: 1** · Đi kèm `../../docs/VAN-DAO-dac-ta-v1.0.md` · Vị trí trong plugin: `tham-chieu/bi-kip.schema.md`
 
 Đây là **hợp đồng** giữa bên thu sách (Thủ khố, pha 2–3) và bên dạy (Thư linh, Giám khảo, nghiệm công). Mọi thứ khác trong hệ đứng lên file này.
 

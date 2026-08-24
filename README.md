@@ -8,7 +8,7 @@ Bạn đưa vào một quyển PDF hoặc EPUB. Vấn Đạo phân giải nó th
 
 ## Trạng thái
 
-**Chưa dùng được.** Đặc tả xong, một validator chạy được, chưa có skill nào. Xem `docs/VAN-DAO-trang-thai-du-an.md`.
+**Chưa dùng được.** Đặc tả xong, một validator chạy được, chưa có skill nào. Xem `../docs/VAN-DAO-trang-thai-du-an.md`.
 
 ## Thế giới quan
 
@@ -21,12 +21,13 @@ Thế giới quan không phải lớp sơn — nó **đổi cách hệ hành x�
 ```
 van-dao/
   .claude-plugin/     plugin.json · marketplace.json
-  docs/               đặc tả · trạng thái dự án · hướng dẫn dựng
   tham-chieu/         data contract
   bin/                script tất định
   tests/              pytest + fixture
   skills/ agents/ hooks/    chưa có gì
 ```
+
+Đặc tả · trạng thái dự án · hướng dẫn dựng nằm ở `../docs/` (workspace BMAD ngoài repo này, không đi kèm khi phân phối/clone riêng `van-dao/`).
 
 ## Chạy validator
 
@@ -39,10 +40,10 @@ python bin/kiem-bi-kip.py --kho tests/fixtures
 
 | Muốn biết | Đọc |
 |---|---|
-| Đang ở đâu, làm gì tiếp | `docs/VAN-DAO-trang-thai-du-an.md` |
-| Hệ thiết kế thế nào và vì sao | `docs/VAN-DAO-dac-ta-v1.0.md` — bắt đầu ở §0 bảng tra |
+| Đang ở đâu, làm gì tiếp | `../docs/VAN-DAO-trang-thai-du-an.md` |
+| Hệ thiết kế thế nào và vì sao | `../docs/VAN-DAO-dac-ta-v1.0.md` — bắt đầu ở §0 bảng tra |
 | Quy cách một bí kíp | `tham-chieu/bi-kip.schema.md` |
-| Dựng môi trường | `docs/VAN-DAO-setup-du-an.md` |
+| Dựng môi trường | `../docs/VAN-DAO-setup-du-an.md` |
 
 ## Giấy phép
 
