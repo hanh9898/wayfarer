@@ -24,6 +24,18 @@ import json
 import sys
 from pathlib import Path
 
+
+# Đầu ra luôn UTF-8, không phụ thuộc code page của máy chạy.
+#
+# Trên Windows, khi stdout bị chuyển hướng — đúng cách skill gọi script rồi bắt
+# đầu ra, và cách CI ghi log — Python lấy code page hệ thống. cp1252/cp1258
+# không mã hoá nổi tiếng Việt, nên script CHẾT giữa lúc in kết quả thay vì báo
+# lỗi bí kíp. Chế độ hỏng tệ: người dùng thấy traceback Python, không thấy quyển
+# sách của mình sai chỗ nào.
+for _luong in (sys.stdout, sys.stderr):
+    if hasattr(_luong, "reconfigure"):
+        _luong.reconfigure(encoding="utf-8")
+
 try:
     import yaml
 except ImportError:

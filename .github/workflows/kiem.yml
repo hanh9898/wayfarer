@@ -2,7 +2,14 @@ name: kiem
 on: [push, pull_request]
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Chạy cả hai OS: người dựng dùng Windows, hook và script nhắm Linux.
+    # Lệch giữa hai bên (xuống dòng, code page, đường dẫn) chỉ hiện ra khi cả
+    # hai đều chạy — không phải khi đọc lại mã.
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

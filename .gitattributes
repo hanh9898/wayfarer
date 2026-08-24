@@ -1,0 +1,12 @@
+# Xuống dòng: LF trong repo VÀ trong working tree, ở cả Linux lẫn Windows.
+#
+# Vì sao `eol=lf` chứ không chỉ `text=auto`: `hooks/*.sh` ở §15 đặc tả chạy trên
+# Linux, mà script shell mang CRLF thì Linux báo `bad interpreter` — lỗi nhìn
+# không ra nguyên nhân. Và nếu sau này fixture khai `van_tay` của một file trong
+# repo, CRLF làm sha256 lệch giữa hai máy: cùng một commit, hai kết quả kiểm.
+* text=auto eol=lf
+
+# Nội dung sách không bao giờ vào repo (.gitignore chặn), nhưng nếu ai đó
+# `git add -f` thì đừng để git thử chuẩn hoá xuống dòng trong file nhị phân.
+*.pdf  binary
+*.epub binary

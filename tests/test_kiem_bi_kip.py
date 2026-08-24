@@ -91,3 +91,24 @@ def test_tai_hien_khong_duoc_tro_tieu_chi():
 def test_ma_thoat_1_khi_co_loi():
     ma, _ = chay(FIX / "sach-loi")
     assert ma == 1
+
+
+# ------------------- DEFECT 4: đầu ra chết theo code page của máy chạy
+
+def test_in_duoc_khi_code_page_khong_phai_utf8():
+    """Script phải in được tiếng Việt dù máy chạy dùng code page cũ.
+
+    Trên Windows, stdout bị chuyển hướng lấy code page hệ thống (cp1252 ·
+    cp1258) — không mã hoá nổi tiếng Việt, nên bản đầu CHẾT giữa lúc in với
+    UnicodeEncodeError. Người dùng thấy traceback Python thay vì thấy bí kíp
+    của mình sai chỗ nào.
+
+    Ép `PYTHONIOENCODING=cp1252` tái hiện đúng ca đó trên cả Linux lẫn Windows.
+    """
+    import os
+    env = {**os.environ, "PYTHONIOENCODING": "cp1252"}
+    r = subprocess.run([sys.executable, str(SCRIPT), str(FIX / "kiem-thu-dac-ta")],
+                       capture_output=True, text=True, encoding="utf-8", env=env)
+    assert "UnicodeEncodeError" not in r.stderr, r.stderr
+    assert r.returncode == 0
+    assert "ĐẠT" in r.stdout

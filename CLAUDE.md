@@ -32,7 +32,9 @@ python bin/kiem-bi-kip.py <quyển> --json           # đầu ra cho skill; mã 
 claude plugin validate . --strict          # bắt buộc sau mỗi lần đụng .claude-plugin/ hay thêm skill
 ```
 
-CI (`.github/workflows/kiem.yml`) chỉ chạy `pytest` trên Python 3.11.
+CI (`.github/workflows/kiem.yml`) chạy `pytest` trên Python 3.11, **cả `ubuntu-latest` và
+`windows-latest`** — người dựng dùng Windows, hook và script nhắm Linux, lệch giữa hai bên chỉ hiện
+ra khi cả hai đều chạy.
 
 ## Luật khi làm việc trong repo này
 
@@ -50,6 +52,10 @@ CI (`.github/workflows/kiem.yml`) chỉ chạy `pytest` trên Python 3.11.
 - **Mọi ví dụ trong đặc tả và `tham-chieu/` phải là ví dụ tổng hợp** (R24) — lấy ví dụ từ bí kíp thật
   là rò rỉ instance qua đường tài liệu, phá tính cách ly của các vai chấm.
 - Yêu cầu đánh số R1–R31 ở đặc tả §8. Sửa hành vi thì trỏ đúng R nào.
+- **Chạy được trên cả Linux và Windows.** `.gitattributes` giữ LF ở cả hai phía. Script trong `bin/`
+  **không được phụ thuộc code page của máy chạy** — mở file thì khai `encoding="utf-8"`, và ép
+  `sys.stdout`/`sys.stderr` về UTF-8 ngay đầu file. Đầu ra tiếng Việt qua đường chuyển hướng trên
+  Windows lấy cp1252/cp1258 và **chết giữa lúc in** thay vì báo lỗi bí kíp.
 
 ## Kiến trúc
 
