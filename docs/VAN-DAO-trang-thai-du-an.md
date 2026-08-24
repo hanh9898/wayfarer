@@ -11,7 +11,7 @@ Tài liệu này nói **đang ở đâu** và **làm gì tiếp**. Không nhắc
 
 | Pha | Trạng thái | Ghi chú |
 |---|---|---|
-| Requirements | **Đóng** | 34 requirement đánh số liền mạch, không open issue |
+| Requirements | **Đóng** | 32 requirement — `R1`–`R31` cộng `R13b`, không open issue |
 | Architecture | **Đóng** | 8 role, 28 component, 13 model, ranh giới đọc/ghi đã khai |
 | Detailed design | **1/8** | Một data contract đã đặc tả; bảy cái còn lại mới có tên |
 | Implementation | **Chưa bắt đầu** | Một script tồn tại nhưng nằm ngoài repo |
@@ -28,8 +28,8 @@ Tài liệu này nói **đang ở đâu** và **làm gì tiếp**. Không nhắc
 | Artifact | Cỡ | Trạng thái |
 |---|---|---|
 | `VAN-DAO-dac-ta-v1.0.md` | 2.112 dòng | Tự đủ, nhất quán nội bộ |
-| `bi-kip.schema.md` | 301 dòng | Data contract, đã dùng để viết validator |
-| `kiem-bi-kip.py` | 529 dòng | **Đã chạy**, có test data, bắt được lỗi thật |
+| `bi-kip.schema.md` | 308 dòng | Data contract, đã dùng để viết validator |
+| `kiem-bi-kip.py` | 541 dòng | **Đã chạy**, có test data, bắt được lỗi thật |
 | `VAN-DAO-setup-du-an.md` | — | Hướng dẫn dựng môi trường |
 
 ## 2.2 Data contract còn thiếu
@@ -54,13 +54,13 @@ Bảy cái, có tên và vai trò trong đặc tả nhưng chưa có schema:
 
 | Loại | Số lượng |
 |---|---|
-| Static check (script) | **3 / 34 requirement** |
+| Static check (script) | **3 / 32 requirement** |
 | Unit test | **0** |
 | Integration test | **0** |
 | Trigger / behavioral eval | **0** |
 | Manual walkthrough | Toàn luồng |
 
-**31/34 requirement hiện chỉ verify được bằng người đọc transcript.** Đây là con số nghiêm trọng nhất trong tài liệu này.
+**29/32 requirement hiện chỉ verify được bằng người đọc transcript.** Đây là con số nghiêm trọng nhất trong tài liệu này.
 
 Không phải toàn bộ đều tự động hoá được — nhóm judgment vốn không. Nhưng tỉ lệ hiện tại nghĩa là **hệ chỉ đúng chừng nào có người ngồi soát**, và ở n=1 người đó sẽ chán.
 
@@ -148,7 +148,7 @@ Data contract viết just-in-time: `lo-do` và `ho-so` khi tới bước cần c
 | Routing | Trigger eval | ~3 |
 | Judgment quality | Manual + κ calibration | ~8 |
 
-**Mục tiêu: kéo 31 requirement manual xuống dưới 10.** Không nhắm 100% — nhóm cuối vốn không tự động hoá được.
+**Mục tiêu: kéo 29 requirement manual xuống dưới 10.** Không nhắm 100% — nhóm cuối vốn không tự động hoá được.
 
 ---
 
@@ -176,8 +176,8 @@ vòng 1 xong → có người học thật → mẫu tích dần → đủ 20 �
 
 | Rủi ro | Mức | Ghi chú |
 |---|---|---|
-| **Đặc tả quá lớn so với bằng chứng** | **Cao** | 2.112 dòng, 34 requirement, 28 component — cho một người dùng chưa học xong chương nào |
-| 31/34 requirement chỉ verify thủ công | Cao | Hệ chỉ đúng chừng nào có người ngồi soát |
+| **Đặc tả quá lớn so với bằng chứng** | **Cao** | 2.112 dòng, 32 requirement, 28 component — cho một người dùng chưa học xong chương nào |
+| 29/32 requirement chỉ verify thủ công | Cao | Hệ chỉ đúng chừng nào có người ngồi soát |
 | Hai giả định nền chưa kiểm | Cao | §17 đặc tả — sai thì dựng lại từ §1 |
 | Bốn cơ chế không kiểm được ở giai đoạn này | Trung bình | §17.1 — đã ghi nhận, không phải việc bỏ sót |
 | Dựng xong thì hết hứng | Trung bình | Rủi ro cố hữu của dự án n=1, đã chấp nhận khi chọn bậc 3 |
