@@ -1,0 +1,14 @@
+# Sách và hồ sơ người học — KHÔNG BAO GIỜ vào repo
+*.pdf
+*.epub
+.vandao/
+
+# BMAD dùng làm công cụ phát triển, không phát hành kèm
+_bmad/
+.claude/skills/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/

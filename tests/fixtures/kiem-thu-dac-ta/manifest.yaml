@@ -1,0 +1,24 @@
+schema: 1
+id: kiem-thu-dac-ta
+loai: bi-kip
+cau_truc: chuoi
+nguon: {tieu_de: "Kiểm thử dựa trên đặc tả", tac_gia: "Nguyễn Văn A", nam: 2018}
+nguon_file: {duong_dan: "tests/fixtures/sach-gia.txt"}
+canh_gioi_vao: luyen-khi
+canh_gioi_ra: truc-co
+mach: [tu-duy, ky-thuat]
+vai: [tester]
+xuong_song: [1]
+chi_nhanh: []
+phu_thuoc: {}
+lop_nhiem_vu:
+  - {chuong: [1], do_phuc_tap: thap, gian_giao: day}
+ha_son_sau: [1]
+khao_thi_quyen:
+  khuon: "Một {he_thong} có {quy_mo}. Nêu MỘT cách tiếp cận và vì sao không chọn hai cách gần nhất."
+  bo_tham_so:
+    - {he_thong: "form đăng ký", quy_mo: "12 trường"}
+    - {he_thong: "API thanh toán", quy_mo: "8 tham số"}
+  du_thua: ["ngân sách quý tới đã duyệt"]
+  tieu_chi_dat:
+    - {id: kq1, mo_ta: "chọn được một cách và loại trừ hai cách gần nhất"}

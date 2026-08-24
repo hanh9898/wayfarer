@@ -1,0 +1,16 @@
+schema: 1
+chuong: 1
+muc_tieu: "Chia được input thành phân vùng tương đương cho một form thật"
+gia_dinh_nen: ["biết một test case gồm những gì"]
+worked_example: {tro_toi: "chương 1, mục 1.2"}
+sai_lam_pho_bien:
+  - dau_hieu: "chia phân vùng theo trường trên màn hình"
+    quan_niem_sai: "tưởng mỗi ô nhập là một phân vùng"
+    cach_chua: "đưa một ô có 3 miền giá trị hợp lệ khác nhau"
+    nguon: nguoi
+tieu_chi_dat:
+  - {id: tc1, mo_ta: "nêu được ≥1 phân vùng mà ranh giới không trùng ranh giới trường nhập"}
+khuon_cau_hoi:
+  - {id: q0, loai: tai_hien, bloom: nho, do_tieu_chi: [tc1], khuon: "Phân vùng tương đương là gì?"}
+  - {id: q1, loai: van_dung, bloom: ap_dung, do_tieu_chi: [tc1], khuon: "Trong {tinh_huong}, trường nào có nhiều hơn một miền hợp lệ?"}
+bai_luyen_lap: "Chia phân vùng cho một form ngươi đang làm."

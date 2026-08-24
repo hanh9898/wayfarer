@@ -1,0 +1,25 @@
+schema: 1
+id: bai-viet-hay
+loai: tan-quyen
+cau_truc: chuoi
+nguon: {tieu_de: "Một bài blog", tac_gia: "B", nam: 2024}
+nguon_file: {duong_dan: "tests/fixtures/sach-gia.txt"}
+canh_gioi_vao: luyen-khi
+canh_gioi_ra: truc-co
+mach: [tu-duy]
+vai: []
+muc_tieu: "Nêu được luận điểm chính và điều kiện nó không áp dụng"
+gia_dinh_nen: []
+worked_example: {tro_toi: "phần 2"}
+sai_lam_pho_bien: []
+tieu_chi_dat:
+  - {id: t1, mo_ta: "chỉ ra được một tình huống luận điểm không áp dụng"}
+khuon_cau_hoi:
+  - {id: q1, loai: van_dung, bloom: ap_dung, do_tieu_chi: [t1], khuon: "Áp vào {tinh_huong} thì vướng gì?"}
+khao_thi_quyen:
+  khuon: "Cho {tinh_huong}. Nêu MỘT kết luận và điều kiện làm ngươi đổi ý."
+  bo_tham_so:
+    - {tinh_huong: "một quyết định kỹ thuật ngươi vừa gặp"}
+  du_thua: []
+  tieu_chi_dat:
+    - {id: k1, mo_ta: "nêu được điều kiện đổi ý, không chỉ nêu kết luận"}
