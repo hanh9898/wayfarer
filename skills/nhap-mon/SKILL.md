@@ -9,12 +9,12 @@ description: Bái sư nhập môn Vấn Đạo. Dùng khi người học gõ /va
 
 Ngôn ngữ giao tiếp (`communication_language`) đã được xác nhận (Bước 0), **và** nghi thức bái sư đã kích hoạt — nghĩa là hồ sơ có đủ tên môn phái, vai, mạch, tên riêng cho 4 vai nói-với-người-học, **và** một bản ghi nhập môn ký do chính người học tự gõ (`~/.vandao/nhap-mon-ky.md` có ít nhất một mục). Thiếu bất kỳ phần nào trong số này thì nói rõ đang dừng ở đâu, không coi là đã xong, không giả vờ bái sư đã kích hoạt khi chưa đủ.
 
-Chỉ điểm (Trưởng môn gọi tên sách cụ thể cho người học đi tìm) là phần nối tiếp của một bản sau, chưa có trong bản này — dừng đúng ở khai vai + mạch + đặt tên 4 vai + nhập môn ký.
+Chỉ điểm (Trưởng môn gọi tên sách cụ thể cho người học đi tìm) là bước nối tiếp ngay sau bái sư — sau khi đủ bốn phần dưới đây, dẫn người học sang `/van-dao:truong-mon` (xem Bước 6).
 
 ## Khi nào skill này không giúp được
 
 - Người học đã bái sư xong (đủ hồ sơ + nhập môn ký), chỉ muốn tiếp tục học một bí kíp đang dở — dùng `/van-dao:be-quan` thay vì gọi lại `nhap-mon`.
-- Người học muốn được chỉ sách cụ thể ngay sau khi bái sư xong (chỉ điểm) — chưa dựng ở bản này, trả lời rõ "chưa hỗ trợ ở bản này", không bịa tên sách để lấp chỗ trống.
+- Người học muốn được chỉ sách cụ thể ngay sau khi bái sư xong (chỉ điểm) — không phải việc của `nhap-mon`, dẫn sang `/van-dao:truong-mon`, không tự bịa tên sách để lấp chỗ trống.
 - Người học hỏi về đột phá cảnh giới/lên cấp, hay bất kỳ tính năng nào thuộc phần sau của lộ trình — chưa dựng ở bản này, trả lời rõ "chưa hỗ trợ ở bản này", không đoán liều, không im lặng bỏ qua — dù đang hỏi giữa lúc bái sư hay bất cứ lúc nào khác trong hội thoại.
 - Người học muốn nhờ chính skill này (hay bất kỳ vai nào) viết/soạn sẵn nội dung nhập môn ký để duyệt — không làm được dưới bất kỳ hình thức nào, kể cả chỉ gợi ý mẫu câu; từ chối và dẫn sang `/van-dao:nhap-mon-ky` để người học tự gõ.
 
@@ -159,6 +159,6 @@ Người học chọn một trong các gợi ý, tự nhập tên khác, hoặc 
 
 Đọc lại hồ sơ và `nhap-mon-ky.md` một lần nữa (giống cách kiểm ở Bước 1):
 
-- **Đủ cả bốn phần** (tên môn phái, nhập môn ký, vai + mạch, tên 4 vai): nói rõ nghi thức bái sư đã kích hoạt, tóm tắt lại toàn bộ hồ sơ vừa xong cho người học bằng đúng tên 4 vai họ vừa đặt. Bước tiếp theo (chỉ điểm sách cụ thể) chưa có ở bản này — nếu người học hỏi luôn "vậy giờ học gì", trả lời rõ "chưa hỗ trợ ở bản này", không bịa tên sách để lấp chỗ trống.
+- **Đủ cả bốn phần** (tên môn phái, nhập môn ký, vai + mạch, tên 4 vai): nói rõ nghi thức bái sư đã kích hoạt, tóm tắt lại toàn bộ hồ sơ vừa xong cho người học bằng đúng tên 4 vai họ vừa đặt. Dẫn tường minh sang bước tiếp theo: mời người học tự gõ `/van-dao:truong-mon` để nhận chỉ điểm sách cụ thể — không tự động chuyển sang, không tự gọi hộ; nếu người học hỏi luôn "vậy giờ học gì", trả lời bằng đúng lời mời gọi lệnh trên, không tự bịa tên sách ngay tại đây.
 - **Thiếu đúng phần nhập môn ký, các phần còn lại đã đủ:** nói rõ **nghi thức bái sư CHƯA kích hoạt** — không giả vờ đã xong dù vai/mạch/tên 4 vai đã có đủ — nhắc lại đúng một lần lệnh `/van-dao:nhap-mon-ky`, nhưng không chặn cuộc trò chuyện dừng lại ở đây nếu người học chưa muốn làm ngay.
 - **Còn thiếu phần khác** (tên môn phái, hoặc vai/mạch, hoặc tên 4 vai): chưa tới lúc xác nhận — quay lại đúng bước tương ứng ở trên trước.
