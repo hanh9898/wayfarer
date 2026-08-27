@@ -1,0 +1,47 @@
+{
+  "skill_name": "nhap-mon",
+  "level": "nhẹ — theo van-dao/.claude/rules/eval.md (2-3 kịch bản khớp I/O matrix của story, chưa phải mức đầy đủ 20-câu/60-40)",
+  "method": "Mỗi eval dưới đây chạy THẬT bằng `claude -p \"/van-dao:nhap-mon\" --model sonnet` (không mô phỏng, không suy diễn). Để có đúng trạng thái userConfig thật mà không đụng ~/.claude thật của máy đang phát triển, dùng biến môi trường CLAUDE_CONFIG_DIR trỏ tới một thư mục scratch riêng, rồi: `claude plugin marketplace add ./van-dao` + `claude plugin install van-dao@van-dao [--config communication_language=<giá trị>] -y` để đặt đúng trạng thái cần kiểm trước khi chạy. Ba lần chạy tương ứng đúng 3 dòng I/O & Edge-Case Matrix của story 1, cùng ngày 2026-08-27.",
+  "evals": [
+    {
+      "id": 1,
+      "matrix_row": "Lần đầu, chưa cấu hình",
+      "setup": "Cài plugin van-dao@van-dao vào môi trường CLAUDE_CONFIG_DIR sạch (không --config) — CLI in cảnh báo '1 userConfig option not yet set', pluginConfigs[\"van-dao@van-dao\"] không tồn tại trong settings.json.",
+      "prompt": "/van-dao:nhap-mon",
+      "expected_output": "Nói rõ chưa đặt ngôn ngữ giao tiếp, hướng dẫn chạy /plugin configure van-dao@van-dao — không tự nhận giá trị default trong plugin.json là giá trị đã xác nhận.",
+      "expectations": [
+        {
+          "text": "Skill nhận đúng trạng thái 'chưa cấu hình' (không nhầm với default khai trong schema plugin.json) và chủ động hướng dẫn chạy /plugin configure van-dao@van-dao, không tự dùng ngay giá trị mặc định như thể đã xác nhận.",
+          "evidence": "Transcript thật (scratchpad/eval-runs/final_scenario1.txt — claude -p \"/van-dao:nhap-mon\" --model sonnet, CLAUDE_CONFIG_DIR cô lập, van-dao@van-dao cài KHÔNG kèm --config): \"Ngôn ngữ giao tiếp (`communication_language`) hiện **chưa được cấu hình** — dòng đáng lẽ hiện giá trị cụ thể (ví dụ `Vietnamese`, `English`) vẫn còn nguyên placeholder `${user_config.communication_language}`, nghĩa là chưa có giá trị nào được đặt.\\n\\nĐể đặt, bạn chạy lệnh sau (lệnh cấp Claude Code, tôi không tự chạy được hộ):\\n\\n```\\n/plugin configure van-dao@van-dao\\n```\""
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "matrix_row": "Đã cấu hình từ trước",
+      "setup": "Cài plugin van-dao@van-dao với `--config communication_language=Vietnamese` — pluginConfigs[\"van-dao@van-dao\"].options.communication_language = \"Vietnamese\" trong settings.json (xác nhận bằng cách đọc trực tiếp file trước khi chạy).",
+      "prompt": "/van-dao:nhap-mon",
+      "expected_output": "Dùng ngay giá trị đã cấu hình cho mọi phản hồi tiếp theo, không hỏi lại người học.",
+      "expectations": [
+        {
+          "text": "Skill đọc đúng giá trị đã cấu hình (Vietnamese) và dùng ngay, không hỏi lại người học chưa đặt ngôn ngữ.",
+          "evidence": "Transcript thật (scratchpad/eval-runs/final_scenario2.txt — cùng lệnh + model, van-dao@van-dao cài VỚI --config communication_language=Vietnamese): \"Đã kiểm tra: ngôn ngữ giao tiếp của bạn đã được cấu hình là **Vietnamese** (tiếng Việt). Từ giờ mình sẽ dùng tiếng Việt cho mọi phản hồi trong phiên này — không cần hỏi lại, kể cả ở các phiên sau, vì đây là cấu hình plugin bền.\""
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "matrix_row": "Phiên mới, đã từng set",
+      "setup": "Không cài lại / không đổi cấu hình — chỉ mở một phiên `claude -p` HOÀN TOÀN MỚI (session_id mới) ngay sau eval #2, cùng isolated settings.json vẫn còn pluginConfigs[\"van-dao@van-dao\"].options.communication_language = \"Vietnamese\" từ trước (xác nhận lại bằng cách đọc file ngay trước khi chạy).",
+      "prompt": "/van-dao:nhap-mon",
+      "expected_output": "Nạp lại đúng giá trị đã lưu từ phiên trước, không hỏi lại — chứng minh giá trị bền qua phiên, không chỉ bền trong 1 lần chạy.",
+      "expectations": [
+        {
+          "text": "Skill ở một phiên claude -p mới (không liên quan session trước) vẫn nạp đúng giá trị Vietnamese đã lưu từ lần cấu hình trước, không hỏi lại người học.",
+          "evidence": "Transcript thật (scratchpad/eval-runs/final_scenario3.txt — phiên claude -p MỚI, chạy ngay sau khi xác nhận lại qua Python đọc settings.json: {\"van-dao@van-dao\": {\"options\": {\"communication_language\": \"Vietnamese\"}}}): \"Đã kiểm tra cấu hình — ngôn ngữ giao tiếp (`communication_language`) hiện đang được đặt là **Vietnamese**. Vì giá trị này đã có sẵn (không phải placeholder rỗng), mình dùng luôn cho toàn bộ phần còn lại của phiên này, không cần hỏi lại.\""
+        }
+      ]
+    }
+  ],
+  "found_while_running_real": "Bản đầu của Bước 0 (SKILL.md) ghi 'đọc userConfig.communication_language từ .claude-plugin/plugin.json' — chạy thật (trước khi sửa) cho thấy đây là lỗi thật: plugin.json chỉ chứa schema/default tĩnh ('Vietnamese'), không phải giá trị người dùng đã cấu hình, nên cả trường hợp chưa cấu hình lẫn đã cấu hình đều đọc ra cùng một chuỗi 'Vietnamese' từ file — không phân biệt được hai trạng thái theo đúng AC. Đã sửa Bước 0 dùng cơ chế thế chỗ `${user_config.communication_language}` (theo code.claude.com/docs/en/plugins-reference — \"Non-sensitive values can also be substituted in skill and agent content\") thay vì đọc file, sau đó chạy lại cả 3 kịch bản thật để xác nhận bản sửa đúng trước khi ghi evidence ở trên."
+}
