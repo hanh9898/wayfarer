@@ -12,7 +12,7 @@ Ngôn ngữ giao tiếp (`communication_language`) đã được xác nhận —
 ## Khi nào skill này không giúp được
 
 - Người học đã bái sư xong (đã có hồ sơ), chỉ muốn tiếp tục học một bí kíp đang dở — dùng `/vd:be-quan` thay vì gọi lại `nhap-mon`.
-- Người học hỏi về đột phá cảnh giới hay các tính năng thuộc Vòng 3/4 — chưa dựng ở bản này, trả lời rõ "chưa hỗ trợ ở bản này" (FR32), không đoán liều.
+- Người học hỏi về đột phá cảnh giới hay các tính năng thuộc Vòng 3/4 — chưa dựng ở bản này, trả lời rõ "chưa hỗ trợ ở bản này", không đoán liều.
 
 ## Trình → xác nhận → ghi → kiểm
 
@@ -34,7 +34,7 @@ ${user_config.communication_language}
 **Không đọc trực tiếp `.claude-plugin/plugin.json` để lấy giá trị này** — file đó chỉ khai *schema*
 (kiểu, tiêu đề, `default` gợi ý), không phải giá trị người học thật sự đã đặt; giá trị thật nằm ở
 `pluginConfigs["van-dao@van-dao"].options` trong `settings.json` của Claude Code, và cách đọc đúng
-là qua chỗ thế chỗ `${user_config.communication_language}` ở trên — đã verify chạy thật (NFR8): đọc
+là qua chỗ thế chỗ `${user_config.communication_language}` ở trên — đã verify chạy thật: đọc
 thẳng `plugin.json` luôn thấy `default: "Vietnamese"` bất kể người học đã cấu hình gì, nên không phân
 biệt được "chưa đặt" với "đã đặt đúng bằng giá trị mặc định".
 
