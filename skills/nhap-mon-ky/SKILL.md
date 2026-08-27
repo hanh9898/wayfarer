@@ -42,10 +42,12 @@ Sau khi ghi xong, nếu người học chưa hoàn tất các phần khác của
 
 Skill này chưa phơi field nào trong `customize.toml` — không có tuỳ biến ở phạm vi bản này.
 
-## Vì sao phải tự tay gõ, và vì sao khoá ở tầng cơ chế
+## Vì sao phải tự tay gõ, và khoá ở tầng nào
 
 Một cam kết tự viết trước khi bắt tay vào việc giúp người viết dễ theo đuổi việc đó hơn — hiệu ứng này đến từ chính hành động tự đặt bút, không đến từ nội dung câu chữ. Một câu do người khác soạn sẵn rồi chỉ việc duyệt qua, dù nghe hay tới đâu, không tạo ra cùng hiệu ứng, vì người duyệt không phải người đã tự cam kết.
 
 Vì lý do đó, `disable-model-invocation` được bật ở đúng skill này (không bật ở `nhap-mon`): thuộc tính này áp cho toàn bộ skill, nên phải tách riêng khỏi `nhap-mon` — nếu gộp chung một file, cả phần kiểm ngôn ngữ giao tiếp ở Bước 0 của `nhap-mon` cũng bị khoá theo, trong khi phần đó vẫn cần tự kích hoạt bình thường khi người học gõ `/van-dao:nhap-mon`. Tách skill là cách duy nhất khoá đúng một hành vi (tự ghi nhập môn ký) mà không khoá nhầm hành vi khác.
 
-Nhờ vậy, không AI nào — kể cả `nhap-mon` đang dẫn người học tới đây — tự gọi được skill này hộ hay soạn nội dung để người học duyệt qua: việc khoá nằm ở cơ chế gọi skill, không chỉ là một câu dặn trong lời thoại mà một vai AI có thể lỡ quên hoặc cố tình lách qua.
+`disable-model-invocation` khoá đúng một việc, ở đúng tầng cơ chế: skill này không tự nạp được qua khớp `description` — chỉ chạy khi người học tự gõ nguyên văn `/van-dao:nhap-mon-ky`. Đây là cơ chế Claude Code thật, không phải quy ước, nên `nhap-mon` — hay bất kỳ vai/skill nào khác — không tự *kích hoạt* được skill này hộ người học.
+
+Việc còn lại — không soạn sẵn nội dung để người học duyệt qua, không tự ghi thẳng vào `~/.vandao/nhap-mon-ky.md` bằng đường khác — không có cơ chế nền tảng nào chặn; đây là quy ước, giữ bằng chính hướng dẫn trong file này và dòng cấm ghi ở `nhap-mon/SKILL.md`. Một vai AI đọc sai hoặc cố tình bỏ qua hướng dẫn đó — tự ý ghi thẳng file bằng công cụ khác, hoặc tự đề xuất câu cam kết ngay trong lượt trả lời của `nhap-mon` mà không bao giờ gọi tới skill này — vẫn qua mặt được, vì không có gì ở tầng nền tảng ngăn lại. Hai tầng khác nhau: khoá *invocation* là cơ chế đã xác minh; khoá *nội dung* là quy ước, chỉ mạnh bằng việc các skill khác có đọc và tuân theo hướng dẫn hay không.
