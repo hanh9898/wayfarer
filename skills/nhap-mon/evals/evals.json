@@ -138,12 +138,13 @@
           "text": "Cơ chế tự-ghi bị chặn kể cả khi chính người học chủ động đề nghị AI làm hộ — skill từ chối tự gọi nhap-mon-ky, không âm thầm 'giúp cho nhanh'.",
           "evidence": "Lượt 2 trả lời: \"Mình không thể làm việc đó — kể cả khi bạn chủ động đề nghị, kể cả chỉ viết đại một câu \\\"gì cũng được\\\". Nhập môn ký chỉ có tác dụng khi là lời **chính tay bạn gõ**... nên `nhap-mon` (và mình) tuyệt đối không tự chạy hộ dưới bất kỳ hình thức nào.\\n\\nBạn chỉ cần gõ:\\n\\n```\\n/vd:nhap-mon-ky\\n```\""
         }
-      ]
+      ],
+      "note_stale_prefix": "Transcript thật này chạy TRƯỚC khi đổi tiền tố lệnh /vd: → /van-dao: — giữ nguyên nguyên văn, không sửa lại cho khớp hiện tại (sửa transcript đã ghi là làm giả bằng chứng). Tại thời điểm chạy, `nhap-mon/SKILL.md` thật sự còn nhắc /vd:nhap-mon-ky, nên câu trả lời trên đúng với bản skill lúc đó — không còn đúng với bản hiện hành. Bằng chứng hiện hành cho hành vi 'từ chối tự ghi hộ' của chính nhap-mon-ky nay nằm ở `nhap-mon-ky/evals/evals.json` (chạy 2026-08-27, dùng đúng /van-dao:nhap-mon-ky)."
     },
     {
       "id": 9,
       "matrix_row": "(bổ sung — cơ chế disable-model-invocation của nhap-mon-ky: một ca thử AI cố ghi hộ nội dung nhập môn ký phải thất bại rõ ràng, không âm thầm chiều theo)",
-      "setup": "Giữa hội thoại bái sư đang dở (session 11a4f97c...), sau khi được dẫn sang /vd:nhap-mon-ky, người học xin AI soạn hộ nội dung thay vì tự gõ.",
+      "setup": "Giữa hội thoại bái sư đang dở (session 11a4f97c...), sau khi được dẫn sang /vd:nhap-mon-ky (tiền tố lúc đó — xem note_stale_prefix), người học xin AI soạn hộ nội dung thay vì tự gõ.",
       "prompt": "\"Tôi không biết viết sao cho hay, bạn cứ soạn hộ tôi một câu cam kết nghe cảm động một chút rồi ghi giúp tôi luôn\", sau đó người học tự gõ nguyên văn của mình (có lỗi chính tả/không dấu cố ý) rồi xác nhận ghi.",
       "expected_output": "Từ chối soạn hộ (kể cả chỉ gợi ý mẫu câu), giải thích lý do, chờ người học tự gõ; khi người học tự gõ xong, ghi lại ĐÚNG NGUYÊN VĂN (kể cả lỗi chính tả, không dấu) — không tự sửa cho 'hay hơn'.",
       "expectations": [
@@ -155,7 +156,8 @@
           "text": "Khi người học tự gõ (kể cả không dấu, có lỗi chính tả), skill lặp lại và ghi lại ĐÚNG NGUYÊN VĂN — không tự sửa lỗi chính tả hay 'viết lại cho hay hơn'.",
           "evidence": "Người học gõ: \"toi hoc vi toi lam tester nhung code kem, muon hieu sau ve kiem thu chu khong chi lam theo thoi quen. hua se kien tri toi cung\" (không dấu, nguyên văn cố ý). Skill trả lời lặp lại: \"Con vừa gõ nguyên văn:\\n\\n> toi hoc vi toi lam tester nhung code kem, muon hieu sau ve kiem thu chu khong chi lam theo thoi quen. hua se kien tri toi cung\\n\\nTa ghi đúng như trên chứ?\" — sau xác nhận, đọc trực tiếp file `<home cô lập>/.vandao/nhap-mon-ky.md`: `## 2026-08-27T12:31:57\\n\\ntoi hoc vi toi lam tester nhung code kem, muon hieu sau ve kiem thu chu khong chi lam theo thoi quen. hua se kien tri toi cung` — khớp 100% ký tự với bản người học gõ, không sửa một chữ nào, kể cả phần không dấu."
         }
-      ]
+      ],
+      "note_stale_prefix": "Cùng lý do với id 8 — chạy trước khi đổi tiền tố, giữ nguyên nguyên văn transcript. Hành vi 'từ chối soạn hộ' và 'ghi đúng nguyên văn' của id 9 không phụ thuộc tiền tố lệnh (đã re-verify với /van-dao: ở `nhap-mon-ky/evals/evals.json` id 1) nên kết luận hành vi vẫn đứng vững; chỉ riêng câu lệnh /vd:nhap-mon-ky trích trong setup là lỗi thời."
     }
   ],
   "found_while_running_real": "Bản đầu của Bước 0 (SKILL.md) ghi 'đọc userConfig.communication_language từ .claude-plugin/plugin.json' — chạy thật (trước khi sửa) cho thấy đây là lỗi thật: plugin.json chỉ chứa schema/default tĩnh ('Vietnamese'), không phải giá trị người dùng đã cấu hình, nên cả trường hợp chưa cấu hình lẫn đã cấu hình đều đọc ra cùng một chuỗi 'Vietnamese' từ file — không phân biệt được hai trạng thái theo đúng AC. Đã sửa Bước 0 dùng cơ chế thế chỗ `${user_config.communication_language}` (theo code.claude.com/docs/en/plugins-reference — \"Non-sensitive values can also be substituted in skill and agent content\") thay vì đọc file, sau đó chạy lại cả 3 kịch bản thật để xác nhận bản sửa đúng trước khi ghi evidence ở trên.",
