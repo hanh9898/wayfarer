@@ -23,8 +23,8 @@ def chay(duong_dan, json=False):
 def ma_loi(duong_dan):
     import json as J
     _, out = chay(duong_dan, json=True)
-    kq = J.loads(out)["ket_qua"][0]
-    return {l["ma"] for l in kq["loi"]}, {c["ma"] for c in kq["canh_bao"]}
+    kq = J.loads(out)["result"][0]
+    return {l["code"] for l in kq["errors"]}, {c["code"] for c in kq["warnings"]}
 
 
 # ---------------------------------------------------------------- ca sạch

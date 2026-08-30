@@ -67,26 +67,26 @@ class KetQua:
     """Ba mức: lỗi chặn nhập kho, cảnh báo nên sửa, ghi chú chỉ để biết."""
 
     def __init__(self, ten):
-        self.ten = ten
-        self.loi = []
-        self.canh_bao = []
-        self.ghi_chu = []
+        self.title = ten
+        self.errors = []
+        self.warnings = []
+        self.notes = []
 
     def L(self, ma, thong_diep, o=None):
-        self.loi.append({"ma": ma, "thong_diep": thong_diep, "o": o})
+        self.errors.append({"code": ma, "message": thong_diep, "where": o})
 
     def C(self, ma, thong_diep, o=None):
-        self.canh_bao.append({"ma": ma, "thong_diep": thong_diep, "o": o})
+        self.warnings.append({"code": ma, "message": thong_diep, "where": o})
 
     def G(self, ma, thong_diep, o=None):
-        self.ghi_chu.append({"ma": ma, "thong_diep": thong_diep, "o": o})
+        self.notes.append({"code": ma, "message": thong_diep, "where": o})
 
-    def dat(self):
-        return not self.loi
+    def passed(self):
+        return not self.errors
 
     def as_dict(self):
-        return {"bi_kip": self.ten, "dat": self.dat(), "loi": self.loi,
-                "canh_bao": self.canh_bao, "ghi_chu": self.ghi_chu}
+        return {"scripture": self.title, "passed": self.passed(), "errors": self.errors,
+                "warnings": self.warnings, "notes": self.notes}
 
 
 # ---------------------------------------------------------------- đọc file
@@ -423,7 +423,7 @@ def check_one(thu_muc: Path) -> KetQua:
         return kq
 
     check_manifest(m, thu_muc, kq)
-    if any(l["ma"] == "schema-khong-khop" for l in kq.loi):
+    if any(l["code"] == "schema-khong-khop" for l in kq.errors):
         return kq
 
     loai = m.get("kind")
@@ -479,22 +479,22 @@ def check_one(thu_muc: Path) -> KetQua:
 
 # ------------------------------------------------------- in kết quả
 
-LABELS = {"loi": "LỖI", "canh_bao": "CẢNH BÁO", "ghi_chu": "ghi chú"}
+LABELS = {"errors": "LỖI", "warnings": "CẢNH BÁO", "notes": "ghi chú"}
 
 
 def print_report(kqs):
     for kq in kqs:
-        trang_thai = "ĐẠT" if kq.dat() else "KHÔNG ĐẠT"
-        print(f"\n=== {kq.ten} — {trang_thai} ===")
-        for muc in ("loi", "canh_bao", "ghi_chu"):
+        trang_thai = "ĐẠT" if kq.passed() else "KHÔNG ĐẠT"
+        print(f"\n=== {kq.title} — {trang_thai} ===")
+        for muc in ("errors", "warnings", "notes"):
             for m in getattr(kq, muc):
-                o = f" [{m['o']}]" if m.get("o") else ""
-                print(f"  {LABELS[muc]:<9}{m['thong_diep']}{o}")
-        if kq.dat() and not kq.canh_bao and not kq.ghi_chu:
+                o = f" [{m['where']}]" if m.get("where") else ""
+                print(f"  {LABELS[muc]:<9}{m['message']}{o}")
+        if kq.passed() and not kq.warnings and not kq.notes:
             print("  không có gì để nói")
 
-    tong_loi = sum(len(k.loi) for k in kqs)
-    tong_cb = sum(len(k.canh_bao) for k in kqs)
+    tong_loi = sum(len(k.errors) for k in kqs)
+    tong_cb = sum(len(k.warnings) for k in kqs)
     print(f"\n{len(kqs)} bí kíp · {tong_loi} lỗi · {tong_cb} cảnh báo")
     if tong_loi:
         print("Lỗi chặn nhập kho. Cảnh báo thì không — nhưng nên đọc.")
@@ -529,12 +529,12 @@ def main():
 
     if a.json:
         print(json.dumps({"schema": SCHEMA,
-                          "ket_qua": [k.as_dict() for k in kqs]},
+                          "result": [k.as_dict() for k in kqs]},
                          ensure_ascii=False, indent=2))
     else:
         print_report(kqs)
 
-    sys.exit(1 if any(not k.dat() for k in kqs) else 0)
+    sys.exit(1 if any(not k.passed() for k in kqs) else 0)
 
 
 if __name__ == "__main__":

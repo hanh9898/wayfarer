@@ -70,22 +70,22 @@ python <gốc-plugin>/bin/giam-dinh.py "<đường-dẫn-tuyệt-đối>"
 
 Script làm ba phép kiểm đường dẫn rồi mới gọi engine, và **chỉ trả về khoá số liệu — nội dung sách không bao giờ ra tới đầu ra của nó**. Gọi engine trực tiếp thì cả cuốn sách nằm trong giá trị trả về, không gì ngăn nó vào ngữ cảnh.
 
-Đầu ra: một object JSON trên stdout, luôn có `trang_thai`. **Phân nhánh theo mã thoát, không theo chuỗi thông báo** — chuỗi không phải hợp đồng ổn định giữa các phiên bản engine:
+Đầu ra: một object JSON trên stdout, luôn có `status`. **Phân nhánh theo mã thoát, không theo chuỗi thông báo** — chuỗi không phải hợp đồng ổn định giữa các phiên bản engine:
 
-| Mã | `trang_thai` | Làm gì |
+| Mã | `status` | Làm gì |
 |---|---|---|
-| 0 | `ok` | Bước 3 — `so_lieu` có đủ số liệu |
-| 1 | `khong_phai_file` · `duoi_khong_ho_tro` · `file_rong` | **Chặn sớm** (xem dưới) |
-| 2 | `khong_rut_duoc_chu` | **Nhánh Đ** — đây mới là bản hỏng thật |
-| 3 | `engine_chua_cai` | Xem dưới |
+| 0 | `ok` | Bước 3 — `metrics` có đủ số liệu |
+| 1 | `not_a_file` · `unsupported_extension` · `empty_file` | **Chặn sớm** (xem dưới) |
+| 2 | `extraction_failed` | **Nhánh Đ** — đây mới là bản hỏng thật |
+| 3 | `engine_not_installed` | Xem dưới |
 
 **Engine chưa cài (mã 3):** nói rõ engine chưa có, đưa lệnh `pip install -r requirements-dev.txt` chạy từ thư mục gốc của plugin — chính thư mục chứa `bin/giam-dinh.py` vừa gọi. **Không tự chạy lệnh cài**: cài gói vào máy người dùng là việc phải hỏi. Dừng.
 
-**Chặn sớm (mã 1):** nói rõ lý do — ca `duoi_khong_ho_tro` thì kèm `duoi_nhan_duoc` script trả về — rồi hỏi lại đường dẫn và dừng. **Tuyệt đối không gửi thư báo bản hỏng ở nhánh này:** thư ghi vào dữ liệu của vai khác, nên một cú gõ nhầm tên file sẽ thành lá thư khai man rằng sách của người học là bản hỏng.
+**Chặn sớm (mã 1):** nói rõ lý do — ca `unsupported_extension` thì kèm `accepted_extensions` script trả về — rồi hỏi lại đường dẫn và dừng. **Tuyệt đối không gửi thư báo bản hỏng ở nhánh này:** thư ghi vào dữ liệu của vai khác, nên một cú gõ nhầm tên file sẽ thành lá thư khai man rằng sách của người học là bản hỏng.
 
 ### Bước 3 — Bốn phép giám định
 
-Đọc `so_lieu` trong JSON script trả về.
+Đọc `metrics` trong JSON script trả về.
 
 1. **Rút được chữ không.** Tới được đây tức là rút được. Nói `words` để người học có cảm giác về khối lượng.
 
@@ -139,6 +139,6 @@ Báo rõ kho đã có, kèm thời điểm ghi và kết quả giám định l�
 
 Vào đây khi Bước 1 khớp `filename` và người học xác nhận đúng là cùng cuốn.
 
-Cập nhật `duong_dan` của **chính bản ghi đó** sang đường dẫn mới, giữ nguyên mọi số liệu giám định và `ghi_luc` cũ — cuốn sách không đổi, chỉ chỗ để đổi. Đọc lại kiểm.
+Cập nhật `duong_dan` của **chính bản ghi đó** sang đường dẫn mới, giữ nguyên mọi số liệu giám định và `logged_at` cũ — cuốn sách không đổi, chỉ chỗ để đổi. Đọc lại kiểm.
 
 **Không** chạy lại script, **không** tạo bản ghi thứ hai, **không** gửi thư báo bản hỏng — đây không phải sách hỏng.

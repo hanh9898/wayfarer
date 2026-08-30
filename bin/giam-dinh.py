@@ -17,15 +17,15 @@ khác hay không. Báo sai làm bẩn dữ liệu của vai khác, không chỉ 
 Dùng:
     giam-dinh.py <đường-dẫn-sách>
 
-Đầu ra: luôn một object JSON trên stdout, luôn có khoá `trang_thai`.
+Đầu ra: luôn một object JSON trên stdout, luôn có khoá `status`.
 
 Mã thoát:
-    0  ok — rút được chữ, `so_lieu` có đủ các khoá số liệu
-    1  chặn sớm: `khong_phai_file` · `duoi_khong_ho_tro` · `file_rong`
+    0  ok — rút được chữ, `metrics` có đủ các khoá số liệu
+    1  chặn sớm: `not_a_file` · `unsupported_extension` · `empty_file`
        → hỏi lại đường dẫn. KHÔNG phải bản hỏng, KHÔNG gửi thư.
-    2  khong_rut_duoc_chu — ba phép kiểm đã qua mà engine vẫn không rút được
+    2  extraction_failed — ba phép kiểm đã qua mà engine vẫn không rút được
        → đây mới là bản hỏng thật.
-    3  engine_chua_cai — chưa `import` được engine.
+    3  engine_not_installed — chưa `import` được engine.
 
 Phụ thuộc: book-to-skill (ghim theo SHA trong requirements-dev.txt).
 """
@@ -72,23 +72,23 @@ SAMPLE_TITLE_COUNT = 5
 
 def emit(trang_thai, ma_thoat, **them):
     """In đúng một object JSON rồi thoát. Không có đường nào khác ra khỏi script."""
-    print(json.dumps({"trang_thai": trang_thai, **them}, ensure_ascii=False, indent=2))
+    print(json.dumps({"status": trang_thai, **them}, ensure_ascii=False, indent=2))
     sys.exit(ma_thoat)
 
 
 def main():
     if len(sys.argv) != 2:
-        emit("thieu_tham_so", 1, thong_diep="Dùng: giam-dinh.py <đường-dẫn-sách>")
+        emit("missing_argument", 1, message="Dùng: giam-dinh.py <đường-dẫn-sách>")
 
     try:
         import book_to_skill
         from book_to_skill import config
     except ImportError as e:
         emit(
-            "engine_chua_cai",
+            "engine_not_installed",
             3,
-            thong_diep=str(e),
-            cach_cai="pip install -r requirements-dev.txt",
+            message=str(e),
+            install_command="pip install -r requirements-dev.txt",
         )
 
     # Chuẩn hoá về tuyệt đối trước mọi phép kiểm: `is_file()` trên đường dẫn tương
@@ -97,29 +97,29 @@ def main():
     try:
         duong_dan = duong_dan.resolve()
     except OSError as e:
-        emit("khong_phai_file", 1, duong_dan=str(duong_dan), thong_diep=str(e))
+        emit("not_a_file", 1, path=str(duong_dan), message=str(e))
 
     # Phép kiểm 1 — là file thật, không phải thư mục.
     # `exists()` trả True cho một thư mục tên `sach.epub`; nó sẽ lọt xuống engine
     # rồi lĩnh ExtractionError và bị gán oan là bản hỏng.
     if not duong_dan.is_file():
-        emit("khong_phai_file", 1, duong_dan=str(duong_dan))
+        emit("not_a_file", 1, path=str(duong_dan))
 
     # Phép kiểm 2 — đuôi nằm trong danh sách engine nhận, SO SAU KHI HẠ CHỮ THƯỜNG.
     # Hằng số chỉ chứa đuôi chữ thường, nên so thẳng sẽ từ chối oan một `.EPUB` tốt.
     duoi = duong_dan.suffix.lower()
     if duoi not in config.SUPPORTED_EXTENSIONS:
         emit(
-            "duoi_khong_ho_tro",
+            "unsupported_extension",
             1,
-            duong_dan=str(duong_dan),
-            duoi=duong_dan.suffix,
-            duoi_nhan_duoc=sorted(config.SUPPORTED_EXTENSIONS),
+            path=str(duong_dan),
+            extension=duong_dan.suffix,
+            accepted_extensions=sorted(config.SUPPORTED_EXTENSIONS),
         )
 
     # Phép kiểm 3 — kích thước lớn hơn 0.
     if duong_dan.stat().st_size == 0:
-        emit("file_rong", 1, duong_dan=str(duong_dan))
+        emit("empty_file", 1, path=str(duong_dan))
 
     # Engine in tiến trình ("Extracting EPUB: ...", "Trying pypdf...") thẳng ra
     # stdout. Không chặn thì nó lẫn vào JSON và bên gọi parse gãy — đã gặp thật ở
@@ -132,7 +132,7 @@ def main():
         # Ba phép kiểm đã qua, nên đây mới là bản hỏng thật. Chuỗi lỗi trả về cho
         # người đọc hiểu chuyện gì, KHÔNG để phân loại lỗi bằng cách so chuỗi —
         # chuỗi đó không phải hợp đồng ổn định giữa các phiên bản engine.
-        emit("khong_rut_duoc_chu", 2, duong_dan=str(duong_dan), thong_diep=str(e))
+        emit("extraction_failed", 2, path=str(duong_dan), message=str(e))
 
     so_lieu = {k: ket_qua[k] for k in METRIC_KEYS if k in ket_qua}
 
@@ -141,7 +141,7 @@ def main():
         so_lieu["chapter_headings_sample"] = mau[:SAMPLE_TITLE_COUNT]
         so_lieu["chapter_headings_da_cat"] = len(mau) - SAMPLE_TITLE_COUNT
 
-    emit("ok", 0, duong_dan=str(duong_dan), so_lieu=so_lieu)
+    emit("ok", 0, path=str(duong_dan), metrics=so_lieu)
 
 
 if __name__ == "__main__":

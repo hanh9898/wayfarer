@@ -45,8 +45,8 @@ def test_khoa_text_khong_bao_gio_ra_stdout():
     """Ràng buộc nặng nhất của cả skill, và là lý do script này tồn tại."""
     ma, d = chay(SACH)
     assert ma == 0
-    assert d["trang_thai"] == "ok"
-    assert "text" not in d["so_lieu"]
+    assert d["status"] == "ok"
+    assert "text" not in d["metrics"]
     assert "text" not in json.dumps(d)
 
 
@@ -67,7 +67,7 @@ def test_stdout_chi_co_json():
 def test_so_lieu_du_khoa_can_dung():
     ma, d = chay(SACH)
     for khoa in ("words", "estimated_tokens", "pages", "pages_label", "chapters_detected", "has_toc"):
-        assert khoa in d["so_lieu"], khoa
+        assert khoa in d["metrics"], khoa
 
 
 @can_sach
@@ -77,7 +77,7 @@ def test_duoi_viet_hoa_van_nhan(tmp_path):
     hoa.write_bytes(SACH.read_bytes())
     ma, d = chay(hoa)
     assert ma == 0
-    assert d["trang_thai"] == "ok"
+    assert d["status"] == "ok"
 
 
 def test_thu_muc_doi_lot_file_khong_phai_ban_hong(tmp_path):
@@ -86,7 +86,7 @@ def test_thu_muc_doi_lot_file_khong_phai_ban_hong(tmp_path):
     d_muc.mkdir()
     ma, d = chay(d_muc)
     assert ma == 1, "phải là mã chặn sớm, không phải mã bản hỏng"
-    assert d["trang_thai"] == "khong_phai_file"
+    assert d["status"] == "not_a_file"
 
 
 def test_duoi_la_khong_phai_ban_hong(tmp_path):
@@ -94,8 +94,8 @@ def test_duoi_la_khong_phai_ban_hong(tmp_path):
     f.write_text("linh tinh", encoding="utf-8")
     ma, d = chay(f)
     assert ma == 1
-    assert d["trang_thai"] == "duoi_khong_ho_tro"
-    assert ".epub" in d["duoi_nhan_duoc"], "danh sách phải lấy từ chính engine"
+    assert d["status"] == "unsupported_extension"
+    assert ".epub" in d["accepted_extensions"], "danh sách phải lấy từ chính engine"
 
 
 def test_file_rong_khong_phai_ban_hong(tmp_path):
@@ -103,13 +103,13 @@ def test_file_rong_khong_phai_ban_hong(tmp_path):
     f.touch()
     ma, d = chay(f)
     assert ma == 1
-    assert d["trang_thai"] == "file_rong"
+    assert d["status"] == "empty_file"
 
 
 def test_duong_dan_khong_ton_tai_khong_phai_ban_hong(tmp_path):
     ma, d = chay(tmp_path / "khong-co-that.epub")
     assert ma == 1
-    assert d["trang_thai"] == "khong_phai_file"
+    assert d["status"] == "not_a_file"
 
 
 @can_sach
@@ -122,7 +122,7 @@ def test_ban_hong_that_ra_ma_thoat_rieng(tmp_path):
     gia.write_bytes(SACH.read_bytes())
     ma, d = chay(gia)
     assert ma == 2, "phải khác mã chặn sớm — mã thoát quyết định có gửi thư hay không"
-    assert d["trang_thai"] == "khong_rut_duoc_chu"
+    assert d["status"] == "extraction_failed"
 
 
 @can_sach
@@ -134,13 +134,13 @@ def test_duong_dan_tieng_viet_co_dau(tmp_path):
     f.write_bytes(SACH.read_bytes())
     ma, d = chay(f)
     assert ma == 0
-    assert d["so_lieu"]["words"] > 0
+    assert d["metrics"]["words"] > 0
 
 
 @can_sach
 def test_cat_bot_tieu_de_chuong_mau(tmp_path):
     """Một cuốn 300 chương không được tự nó thành một khối lớn trong ngữ cảnh."""
     ma, d = chay(SACH)
-    mau = d["so_lieu"].get("chapter_headings_sample")
+    mau = d["metrics"].get("chapter_headings_sample")
     if isinstance(mau, list):
         assert len(mau) <= 5
