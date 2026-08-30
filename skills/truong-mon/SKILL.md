@@ -18,7 +18,7 @@ Bất kỳ nhánh nào ở trên, đọc lại sau khi ghi thấy lệch với t
 ## Khi nào skill này không giúp được
 
 - Hồ sơ chưa có đủ vai + mạch (bái sư chưa xong) — từ chối chỉ điểm, dẫn người học quay lại `/van-dao:nhap-mon`, không tự suy vai/mạch hộ dưới bất kỳ hình thức nào.
-- Người học đã tìm được sách và muốn đưa thẳng vào tàng kinh các ngay — việc thu nhận/thẩm định sách chưa dựng ở bản này; nói rõ "chưa hỗ trợ ở bản này", không bịa tên lệnh để lấp chỗ trống.
+- Người học đã tìm được sách và muốn đưa vào kho — không phải việc của Trưởng môn, nhưng đã có đường: dẫn họ sang `/van-dao:thu-bi-kip` để giám định cuốn sách đó. Trưởng môn không tự giám định hộ, cũng không tự đánh dấu chỉ điểm là đã thu.
 - Người học muốn học nội dung cụ thể của một chương/bài học — không phải việc của Trưởng môn (thuộc vai dạy, chưa dựng ở bản này); dẫn người học chờ, không tự dạy thay.
 - Người học hỏi về đột phá cảnh giới/lên cấp — chưa hỗ trợ ở bản này, không đoán liều, không im lặng bỏ qua.
 - Người học muốn xem toàn bộ kho sách hiện có, hay đếm kho để "chắc ăn hơn" trước khi chỉ điểm — không phải việc của Trưởng môn, và ở bản này kho tàng kinh các luôn chưa có quyển nào (không có luồng nào trong hệ đưa sách vào kho ở bản này) — nói thẳng sự thật đó, không tự đi đọc kho để kiểm tra.
@@ -111,6 +111,8 @@ Không xoá hay sửa bất kỳ dòng cũ nào tại chỗ — chỉ ghi thêm 
 7. **Ghi:** thêm N+M dòng mới vào `truong-mon/chi-diem.jsonl` (tạo file/thư mục nếu chưa có), mỗi dòng một chỉ điểm, `trang_thai = "dang_treo"`, `muc_chac_chan = "suy_doan"`, `id` mới cho mỗi mục (xem Định dạng file). Chỉ nối thêm — không sửa hay xoá dòng nào đã có.
 
 8. **Kiểm:** đọc lại file, xác nhận đủ N+M dòng mới vừa ghi khớp đúng nội dung vừa xác nhận ở bước 6.
+
+9. **Nói rõ bước kế tiếp:** tìm được quyển nào rồi thì quay lại gõ `/van-dao:thu-bi-kip` kèm đường dẫn tới file sách để giám định và đưa vào kho. Nói câu này ngay khi chỉ điểm vừa ghi xong — người học đi tìm sách xong thường không biết bước sau là gì, và Trưởng môn là chỗ duy nhất họ đã ở.
 
 ### Tra lại theo tên cũ
 

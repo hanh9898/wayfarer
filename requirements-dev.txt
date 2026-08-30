@@ -1,2 +1,12 @@
 pyyaml
 pytest
+
+# Sach engine (PDF/EPUB -> text + metadata), dung boi skill thu-bi-kip.
+# Ghim theo commit SHA, khong theo tag: tag di chuyen duoc, SHA thi khong.
+# Doi ban thi chay lai eval cua thu-bi-kip; hinh dang dict tra ve khong phai
+# hop dong on dinh. Ly do day du: xem Design Notes cua story 1.4.
+#
+# LUU Y: file nay giu thuan ASCII co chu dich. pip doc requirements bang codec
+# mac dinh cua he (cp1252 tren Windows), nen mot dau tieng Viet trong comment
+# lam ca lenh cai chet voi UnicodeDecodeError. Da gap that 2026-08-28.
+book-to-skill[pdf,epub] @ git+https://github.com/virgiliojr94/book-to-skill.git@8a2cae63f0b1d1a3add14fc8b7688ba9cfafd9c4

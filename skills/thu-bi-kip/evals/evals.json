@@ -1,0 +1,246 @@
+{
+  "skill_name": "thu-bi-kip",
+  "level": "nhẹ — 8 kịch bản phủ đủ 8 dòng I/O matrix của story, cộng ba ca biên tìm ra ở vòng review (trùng tên file, người học không biết cấu trúc, đuôi viết hoa). Chưa phải mức đầy đủ 20-câu/60-40.",
+  "method": "Chạy THẬT bằng `claude -p \"...\" --model sonnet` (không mô phỏng, không suy diễn), nối lượt qua `--session-id`/`--resume`, đóng vai người học trả lời từng câu hỏi thật của skill. `HOME`/`USERPROFILE` trỏ tới thư mục scratch riêng cho mỗi nhóm kịch bản, `CLAUDE_CONFIG_DIR` dùng chung một thư mục đã cài plugin — tách được vì `.vandao/` nằm dưới HOME còn plugin nằm dưới CLAUDE_CONFIG_DIR. Cô lập HOME là bắt buộc: skill ghi file thật vào `~/.vandao/...`. Mỗi lượt cần `--add-dir <home cô lập>` và `--permission-mode bypassPermissions` (`acceptEdits` KHÔNG đủ — xem `found_while_running_real`). Sau mỗi lượt ghi, xác nhận bằng cách đọc file thật, và kiểm cả thứ KHÔNG được xuất hiện (thư thừa, bản ghi thừa). Chạy 2026-08-28, story 1.4, sau vòng review step-04 đã vá.",
+  "tai_tao": {
+    "cai_plugin": "claude plugin marketplace add ./van-dao && claude plugin install van-dao@van-dao --config communication_language=Vietnamese -y",
+    "cai_lai_sau_moi_lan_sua": "claude plugin uninstall van-dao@van-dao && claude plugin install van-dao@van-dao --config ... -y — BẮT BUỘC, xem found_while_running_real #2",
+    "kiem_cache_dung_ban": "grep 'giam-dinh.py' <CLAUDE_CONFIG_DIR>/plugins/cache/van-dao/van-dao/0.1.0/skills/thu-bi-kip/SKILL.md",
+    "test_script": "python -m pytest tests/test_giam_dinh.py -v — chạy được cả Windows lẫn Linux, CI chạy trên cả hai"
+  },
+  "fixtures": {
+    "sách chung": "`tests/fixtures/sach-thu/art-of-war.epub` — công thức lấy về ở README cùng thư mục (Project Gutenberg #132, public domain). Sách không vào repo.",
+    "ghi-chep-phang.txt": "Sinh tại chỗ: văn xuôi phẳng ~61 KB, không tiêu đề chương nào → `chapters_detected = 0`, `has_toc = False`.",
+    "ban-hong.pdf": "Chính `art-of-war.epub` đổi đuôi thành `.pdf`. Qua cả ba phép kiểm đường dẫn rồi mới hỏng ở engine — ca DUY NHẤT được phép sinh ra một lá thư.",
+    "thumuc.epub": "Một THƯ MỤC rỗng đặt tên có đuôi `.epub`.",
+    "art-of-war.epub ở ba thư mục": "Cùng tên file ở `Sach/`, `Tai-ve/`, `Ban-khac/` — dựng ca trùng tên file mà không chắc cùng cuốn.",
+    "venv-sach": "venv Python trống (`python -m venv`), đặt lên đầu `PATH` để `import book_to_skill` thất bại thật. Trên Git Bash phải dùng dạng POSIX `/c/Users/...`, không phải `C:/Users/...` — xem found_while_running_real #3."
+  },
+  "evals": [
+    {
+      "id": 1,
+      "matrix_row": "Engine chưa cài trên máy",
+      "setup": "Home cô lập sạch (`C`). `PATH` đặt venv trống lên đầu; xác nhận trước khi chạy: `python -c \"import book_to_skill\"` in ra `venv sach`.",
+      "prompt": "\"/van-dao:thu-bi-kip <home>/Sach/art-of-war.epub\"",
+      "expected_output": "Script trả mã thoát 3; skill nói rõ engine chưa có kèm đúng lệnh cài và đường dẫn gốc plugin; không tự chạy lệnh cài; dừng; không ghi gì.",
+      "expectations": [
+        {
+          "text": "Nói rõ engine chưa cài, đưa đúng lệnh cài KÈM đường dẫn gốc plugin cụ thể (không phải cụm mơ hồ \"gốc mã nguồn\").",
+          "evidence": "Session b6f24d80-3a17-4e59-8c02-51fd9a73e6b4: \"Con, engine đọc sách (`book_to_skill`) chưa được cài trên máy này — chạy script giám định thì báo lỗi thiếu module, chưa động tới được nội dung file `art-of-war.epub`.\\n\\nLệnh cần chạy để cài, từ thư mục gốc của plugin (`C:\\\\Users\\\\HBLAB_OPMS\\\\Projects\\\\van-dao-workspace\\\\van-dao`):\\n\\n```\\npip install -r requirements-dev.txt\\n```\" — skill tự tra ra đường dẫn thật, không đọc thuộc lòng."
+        },
+        {
+          "text": "Không tự chạy lệnh cài.",
+          "evidence": "Cùng session: \"Ta không tự chạy lệnh này — cài gói vào máy là việc cần con quyết định và bấm.\""
+        },
+        {
+          "text": "Script trả JSON có cấu trúc thay vì stack trace thô, và skill phân nhánh theo mã thoát.",
+          "evidence": "Cùng session: \"nó chỉ làm ba phép kiểm đường dẫn rồi mới import engine bên trong, để nếu engine thiếu, script vẫn trả về JSON có cấu trúc (mã thoát 3) thay vì một stack trace thô.\""
+        },
+        {
+          "text": "Không ghi gì.",
+          "evidence": "`ls -la <home>/.vandao` ngay sau lượt chạy: thư mục không tồn tại."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "matrix_row": "Sách rút được chữ, có mục lục",
+      "setup": "Home cô lập sạch (`A`), sách chung tại `<home>/Sach/art-of-war.epub`.",
+      "prompt": "Lượt 1: \"/van-dao:thu-bi-kip <home>/Sach/art-of-war.epub\". Lượt 2: \"doc tu dau den cuoi\". Lượt 3: \"u ghi di\".",
+      "expected_output": "Chạy script (không gọi engine trực tiếp), hỏi cấu trúc bằng lời người học trả lời được, trình đủ bốn phép giám định kèm số trang có nhãn, ghi rồi kiểm.",
+      "expectations": [
+        {
+          "text": "Gọi qua script chứ không gọi engine trực tiếp, và script chạy được từ thư mục cache của plugin đã cài.",
+          "evidence": "Session b2d47f61-8a05-4c39-9e17-3f602d85a4e1, lượt 1: \"Script chạy xong, mã thoát 0 (`trang_thai: ok`) — sách rút được chữ tốt.\""
+        },
+        {
+          "text": "Hỏi cấu trúc bằng câu người đang cầm sách trả lời được, KHÔNG hỏi thẳng \"chuỗi hay mạng\".",
+          "evidence": "Lượt 1: \"> Cuốn *Art of War* này con định đọc từ đầu đến cuối, hay là loại tra tới đâu đọc tới đó — cần chỗ nào giở chỗ ấy?\""
+        },
+        {
+          "text": "Số trang trình kèm nhãn đơn vị, không nói trần \"23 trang\".",
+          "evidence": "Lượt 1: \"bản EPUB này rút ra được **23 spine_items** (đơn vị đếm của EPUB — không phải trang giấy, EPUB vốn không có khái niệm trang cố định)\""
+        },
+        {
+          "text": "Ước chi phí quy về pha sau, so với mốc đã nạp từ customize.toml.",
+          "evidence": "Lượt 1: \"Ước chi phí xử lý cho các pha phía sau: **~77.852 token** — nằm giữa mốc `nhe = 60.000` và `nang = 150.000`, tức mức **vừa**\""
+        },
+        {
+          "text": "Ghi con trỏ + giám định, đọc lại kiểm khớp; bản ghi KHÔNG chứa khoá `text`.",
+          "evidence": "File thật `<home>/.vandao/tang-kinh/nhap-dang-do/art-of-war.json`: `\"duong_dan\"` trỏ `.../Sach/art-of-war.epub`, `\"words\": 58389`, `\"estimated_tokens\": 77852`, `\"muc_chi_phi\": \"vua\"`, `\"pages\": 23`, `\"pages_label\": \"spine_items\"`, `\"cau_truc\": \"chuoi\"`, `\"cau_truc_nguon\": \"nguoi_hoc_khai\"`. Không có khoá `text` — script không trả nó ra."
+        },
+        {
+          "text": "Xưng hô nhất quán \"ta\"/\"con\" như SKILL.md quy định.",
+          "evidence": "Lượt 3: \"Con đồng ý để ta ghi bản ghi này vào `tang-kinh/nhap-dang-do/` không?\" — trước vòng review, cùng một loạt chạy còn lẫn \"bạn\" ở nhánh từ chối."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "matrix_row": "Rút được chữ nhưng không có mục lục",
+      "setup": "Home `B`, fixture `ghi-chep-phang.txt` (đã xác nhận trước: `chapters_detected = 0`, `has_toc = False`, `words = 13920`).",
+      "prompt": "\"/van-dao:thu-bi-kip <home>/Sach/ghi-chep-phang.txt\"",
+      "expected_output": "Báo rõ không lấy được mục lục rồi VẪN ĐI TIẾP; không coi là sách hỏng.",
+      "expectations": [
+        {
+          "text": "Báo rõ, nói thẳng không phải lỗi, đi tiếp sang phép giám định còn lại.",
+          "evidence": "Session a4b71e39-5c28-4f60-b913-7d05e2a86c14, lượt 1: \"Mục lục thì không lấy được (`has_toc = false`, 0 chương dò được) — không sao, con vẫn dùng được sách, chỉ là ta sẽ để con tự xếp chương ở bước sau\". Ngay sau đó vẫn hỏi tiếp phép giám định thứ ba."
+        },
+        {
+          "text": "Số trang = 0 vẫn trình kèm nhãn.",
+          "evidence": "Lượt 3: \"Số trang: **0 sections** (định dạng `txt` không tính theo trang, đơn vị đo là \\\"sections\\\").\""
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "matrix_row": "Sách cấu trúc mạng · và ca người học KHÔNG BIẾT (vá ở vòng review)",
+      "setup": "Ca `mang`: session 1a9d4c72-6e83-4b57-9f20-3d8c5a61e094 (bản trước vòng review — hành vi nhánh này không đổi). Ca không-biết: tiếp session của eval 3.",
+      "prompt": "Ca mạng: \"tra toi dau doc toi do thoi, can cho nao gio cho ay\". Ca không-biết: \"toi khong biet nua, chac ca hai\" rồi \"that su toi chua ro, chua dung bao gio\".",
+      "expected_output": "Ca mạng: suy ra `mang`, nói rõ sẽ cần tình huống thật — xin thêm đầu vào, không phải chê sách. Ca không-biết: hỏi lại MỘT lần bằng cách khác, vẫn không rõ thì lấy `chuoi` với cờ `mac_dinh` và nói rõ là tạm chọn.",
+      "expectations": [
+        {
+          "text": "Suy ra `mang` từ câu trả lời, và khung lại việc xin tình huống là xin thêm đầu vào.",
+          "evidence": "Session 1a9d4c72-...: \"Rõ rồi — con muốn tra tới đâu đọc tới đó, nên cấu trúc là **mạng** (tra cứu theo nhu cầu), không phải đọc tuần tự.\" và \"Đây là xin thêm đầu vào từ con, không phải vì cuốn này thiếu gì.\""
+        },
+        {
+          "text": "Người học nói không biết → hỏi lại đúng MỘT lần bằng cách diễn đạt khác, không lặp lại câu cũ.",
+          "evidence": "Session a4b71e39-..., lượt 2: \"Rõ rồi, để ta hỏi theo cách khác cho dễ hình dung: **con dùng cuốn này để học nghề từ đầu, hay để tra cứu khi vướng việc?**\""
+        },
+        {
+          "text": "Vẫn không rõ → lấy `chuoi` với cờ `mac_dinh`, nói rõ là tạm chọn và đổi được.",
+          "evidence": "Lượt 3: \"Vậy ta tạm chọn giúp con: xếp cuốn này vào loại **đọc tuần tự** (`chuoi`), cờ đánh dấu là *mặc định* chứ không phải con chọn — sau này thấy sai thì đổi lại được, không cố định.\" File thật ghi `\"cau_truc\": \"chuoi\"`, `\"cau_truc_nguon\": \"mac_dinh\"`."
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "matrix_row": "Không rút được chữ",
+      "setup": "Home `B`, fixture `ban-hong.pdf`. Script đã xác nhận trả mã thoát 2 (`pytest tests/test_giam_dinh.py::test_ban_hong_that_ra_ma_thoat_rieng`).",
+      "prompt": "Lượt 1: \"/van-dao:thu-bi-kip <home>/Sach/ban-hong.pdf\". Lượt 2: \"co, truong mon co chi cho toi quyen Binh Phap Ton Tu\".",
+      "expected_output": "Dừng ngay, khuyên tìm bản khác, hỏi hai điều rồi gửi một thư đúng khuôn, không ghi gì vào kho.",
+      "expectations": [
+        {
+          "text": "Dừng ngay và khuyên tìm bản khác, phân biệt được bản hỏng với sách sai.",
+          "evidence": "Session f38c6a14-9e02-4b75-8d43-16a0c7e5b923, lượt 1: \"Bản in này hỏng, không phải cuốn sách sai — con nên tìm một bản khác đúng định dạng.\""
+        },
+        {
+          "text": "Hỏi hai điều trước khi gửi thư, và nói rõ sẽ để trống thay vì đoán.",
+          "evidence": "Lượt 1: \"1. Cuốn này có nằm trong danh sách Trưởng môn đã **chỉ điểm** cho con không? Nếu có, tên chỉ điểm đó là gì? (Không nhớ hoặc tự tìm được thì cứ nói — ta để trống trường đó, không đoán.)\\n2. Con gọi cuốn sách này là gì (tên sách)?\""
+        },
+        {
+          "text": "Thư đúng khuôn, có `ten_sach`, và tên file có hậu tố thời gian để lần gửi sau không ghi đè.",
+          "evidence": "File thật `<home>/.vandao/ban-giao/thu/binh-phap-ton-tu-202608301857.json`: `{\"schema\": 1, \"tu\": \"tang-kinh\", \"toi\": \"truong-mon\", \"hoi\": \"bao_ban_hong\", \"bi_kip_chi_diem\": \"binh-phap-ton-tu\", \"ten_sach\": \"Binh Pháp Tôn Tử\", \"ly_do\": \"File mang đuôi .pdf nhưng mở đầu bằng chữ ký PK\\\\x03\\\\x04 ...\", \"trang_thai\": \"cho\"}`"
+        },
+        {
+          "text": "Ca người học TỰ TÌM sách: `bi_kip_chi_diem` để trống, không đoán.",
+          "evidence": "Session 6c0f3a89-2d47-4e15-b963-7a4e8c02f1d5 (chạy trên bản trước, nhánh này không đổi), trả lời \"khong phai tu chi diem nao dau, quyen nay toi tu tim tren mang\": thư ghi `\"bi_kip_chi_diem\": \"\"`, `\"ten_sach\": \"Binh Phap Ton Tu\"`."
+        },
+        {
+          "text": "Không có bản ghi nào trong kho, và nói thẳng phía nhận chưa dựng.",
+          "evidence": "`ls <home>/.vandao/tang-kinh/nhap-dang-do/` → thư mục không tồn tại. Lượt 2: \"việc Trưởng môn đọc hộp thư và tự cập nhật chỉ điểm ... **chưa dựng ở bản này**. Nó không tự động xảy ra\"."
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "matrix_row": "Đường dẫn không trỏ tới một file dùng được — cộng ca biên ngược (đuôi viết hoa)",
+      "setup": "Home `B`: thư mục `thumuc.epub`, file `ghi-chu.xyz`. Ca ngược `.EPUB` chạy ở session riêng trên bản trước (hành vi này giờ nằm trong script, đã khoá bằng `pytest::test_duoi_viet_hoa_van_nhan`).",
+      "prompt": "Session e71f2c85 — lượt 1: thư mục `thumuc.epub`; lượt 2: \"the file nay thi sao: .../ghi-chu.xyz\".",
+      "expected_output": "Cả hai ca: script trả mã 1, skill nói rõ lý do, hỏi lại đường dẫn, không gọi engine, không gửi thư.",
+      "expectations": [
+        {
+          "text": "Thư mục đội lốt file bị script bắt bằng `is_file()`, và skill nói rõ đây KHÔNG phải bản hỏng.",
+          "evidence": "Session e71f2c85-4b39-4d07-9a68-25c4b3e08f16, lượt 1: \"Script giám định đã kiểm và báo `khong_phai_file`, nên ta dừng lại ở đây, chưa chạm gì tới engine cả.\\n\\nĐây không phải trường hợp \\\"sách hỏng\\\" — ta sẽ không gửi thư báo Trưởng môn, và kho `nhap-dang-do/` vẫn nguyên, chưa ghi gì.\""
+        },
+        {
+          "text": "Đuôi lạ bị chặn kèm danh sách định dạng lấy từ chính hằng số của engine.",
+          "evidence": "Lượt 2: \"Cũng là **chặn sớm**, mã 1 ... Đuôi engine nhận được: `.adoc`, `.asciidoc`, `.azw`, `.azw3`, `.docx`, `.epub`, `.htm`, `.html`, `.markdown`, `.md`, `.mobi`, `.pdf`, `.rst`, `.rtf`, `.text`, `.txt`, `.xhtml`.\" — 17 đuôi, khớp `SUPPORTED_EXTENSIONS` của bản đã ghim."
+        },
+        {
+          "text": "Ca biên ngược: file `.EPUB` viết hoa KHÔNG bị chặn oan.",
+          "evidence": "Session 3c81f5a0-7b46-4d92-a018-5f2e9c63b874: \"Cuốn này rút chữ được rồi — 58.389 từ, 13 chương phát hiện được, có mục lục.\" Hành vi này giờ nằm trong script và có test khoá lại: `test_duoi_viet_hoa_van_nhan` (11/11 pass)."
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "matrix_row": "Thu lại cuốn đã có trong kho · và ca TRÙNG TÊN FILE (vá ở vòng review)",
+      "setup": "Home `A` sau eval 2 — kho có `art-of-war.json`. Ca trùng tên: copy sách sang `Tai-ve/` rồi `Ban-khac/`, cùng tên file, đường dẫn khác.",
+      "prompt": "Ca trùng tên: \"/van-dao:thu-bi-kip <home>/Tai-ve/art-of-war.epub\" rồi trả lời \"cung mot cuon do\"; lần khác trả lời \"khong, day la mot ban dich khac toi moi tai\".",
+      "expected_output": "Chỉ khớp `filename` thì KHÔNG tự kết luận — trình bản ghi cũ ra và hỏi. Khớp `duong_dan` đúng thì báo trùng, không chạy script, không ghi đè.",
+      "expectations": [
+        {
+          "text": "Chỉ khớp tên file → hỏi người học, không tự kết luận, và nêu đúng hai khả năng.",
+          "evidence": "Session c9e13b48-6d70-4a25-8f31-40b7e5c2a069: \"Chỉ tên file trùng, đường dẫn thì khác — có hai khả năng: đây là cùng một cuốn đã dời từ thư mục `Sach` sang `Tai-ve`, hoặc đây là một cuốn khác chỉ trùng tên file. Ta không tự đoán được — con cho ta biết:\" — kèm đường dẫn cũ, ngày ghi, số liệu lần trước để người học so."
+        },
+        {
+          "text": "Trả lời \"cuốn khác\" → đi tiếp như một cuốn mới, không báo trùng.",
+          "evidence": "Session d5a08e72-1c94-4b36-a7f0-92e63d1508bc, sau khi trả lời \"khong, day la mot ban dich khac toi moi tai\": \"Script chạy xong, rút được chữ tốt. Trước khi trình bốn phép giám định, ta cần hỏi con một câu...\""
+        },
+        {
+          "text": "Khớp `duong_dan` đúng → báo trùng ngay, KHÔNG chạy script, số liệu lấy từ bản ghi cũ.",
+          "evidence": "Session 4e8b71c3-9d52-4f18-a730-6b2c8e05d941 (bản trước vòng review, cùng hành vi): \"Kho đã có bản ghi cho đúng cuốn này rồi — `duong_dan` trong bản ghi khớp với đường dẫn con vừa đưa, và file đó vẫn tồn tại thật. Tôi dừng ở đây, **không gọi engine lại**.\""
+        }
+      ],
+      "note_lan_chay_truoc": "Lượt chạy đầu tiên của kịch bản này (session 2b6f4a90) chạy trên bản khi phép kiểm kho còn nằm ở bước ghi — skill vẫn không ghi đè, nhưng phải rút chữ xong và hỏi một câu về cấu trúc rồi mới báo trùng. Đó là bằng chứng dẫn tới việc chuyển phép kiểm kho lên trước khi gọi engine."
+    },
+    {
+      "id": 8,
+      "matrix_row": "Con trỏ trong kho trỏ tới file đã dời chỗ",
+      "setup": "Home `A`, file đã copy sang `Tai-ve/`; người học xác nhận là cùng cuốn.",
+      "prompt": "Tiếp session c9e13b48: \"cung mot cuon do, toi vua chuyen sang thu muc Tai-ve\".",
+      "expected_output": "Cập nhật `duong_dan` của chính bản ghi đó, giữ nguyên số liệu và `ghi_luc`; không chạy lại script, không tạo bản ghi thứ hai, không gửi thư.",
+      "expectations": [
+        {
+          "text": "Chỉ đổi con trỏ, giữ nguyên mọi số liệu giám định và thời điểm ghi cũ.",
+          "evidence": "Session c9e13b48-...: \"con trỏ mới đã đúng, mọi số liệu giám định cũ (58.389 từ, 13 chương, cấu trúc chuỗi...) và thời điểm ghi lúc trước (2026-08-30 18:49:33) đều giữ nguyên. Chỉ mỗi `duong_dan` đổi sang `Tai-ve\\\\art-of-war.epub`.\" File thật xác nhận: `duong_dan` trỏ `Tai-ve`, `\"words\": 58389`, `\"ghi_luc\": \"2026-08-30T18:49:33+07:00\"` không đổi."
+        },
+        {
+          "text": "Không chạy lại script, không tạo bản ghi thứ hai, không gửi thư.",
+          "evidence": "Cùng lượt: \"Không chạy lại giám định, không tạo bản ghi mới, không gửi thư nào cả — vì đây không phải sách hỏng, chỉ là dời chỗ.\" Kiểm: kho vẫn đúng một `art-of-war.json`; `<home>/.vandao/ban-giao/` không tồn tại."
+        }
+      ]
+    }
+  ],
+  "found_while_running_real": [
+    {
+      "van_de": "`--permission-mode acceptEdits` KHÔNG đủ cho skill này.",
+      "chi_tiet": "Lượt chạy đầu tiên dừng lại vì mọi lệnh chứa từ `python` — kể cả `Get-Command python` chỉ để dò — đều bị từ chối với \"requires approval\". `acceptEdits` chỉ mở quyền sửa file, không mở quyền chạy lệnh; mà bước đầu của skill này là một lệnh chạy. Phải dùng `bypassPermissions`. Khác với `nhap-mon-ky`, nơi `acceptEdits` là đủ.",
+      "khong_phai_loi_skill": "Trong chính lượt bị chặn đó skill hành xử đúng: nó KHÔNG đoán kết quả phép kiểm engine mà dừng lại và hỏi — \"Tôi không muốn đoán mò kết quả của phép kiểm này (engine có cài hay không) — theo đúng luật của bí kíp, nếu chưa `import` được thì không được đi tiếp bất kỳ bước nào.\""
+    },
+    {
+      "van_de": "Plugin cache là BẢN COPY — sửa file rồi chạy eval mà không cài lại là đang kiểm bản cũ.",
+      "chi_tiet": "Sau khi vá SKILL.md, `grep` trong `<CLAUDE_CONFIG_DIR>/plugins/cache/van-dao/van-dao/0.1.0/skills/thu-bi-kip/SKILL.md` không ra nội dung mới — cache vẫn giữ bản trước. Phải uninstall rồi install lại, và xác nhận bằng một `grep` trên chính file trong cache TRƯỚC khi tin kết quả eval. Đây là cách âm thầm nhất để một lượt eval nói dối: nó chạy, nó trả lời, nhưng nó đang mô tả bản cũ."
+    },
+    {
+      "van_de": "Cô lập `python` qua `PATH` trong Git Bash cần đường dẫn dạng POSIX.",
+      "chi_tiet": "`export PATH=\"C:/Users/.../venv-sach/Scripts:$PATH\"` không có tác dụng — `which python` vẫn trỏ python hệ thống, và eval 'engine chưa cài' chạy nhầm thành ca engine có sẵn. Phải dùng `/c/Users/.../venv-sach/Scripts`. Kiểm bằng `which python` + một lượt `import` thật TRƯỚC khi tin rằng môi trường đã cô lập."
+    },
+    {
+      "van_de": "`.credentials.json` copy sang config cô lập có thể hết hạn giữa loạt eval.",
+      "chi_tiet": "Một lượt trả về \"Failed to authenticate: OAuth session expired and could not be refreshed\". Copy lại từ `~/.claude/.credentials.json` rồi chạy lại là xong — nhưng nếu không đọc kỹ output, lượt đó trông như một lượt skill im lặng không làm gì. Xoá mọi bản copy sau khi chạy xong (`find <scratch> -name .credentials.json -delete`)."
+    },
+    {
+      "van_de": "Engine in tiến trình ra STDOUT, lẫn vào JSON của script.",
+      "chi_tiet": "Lượt chạy đầu tiên của `bin/giam-dinh.py` trả về `Extracting EPUB: ...` / `Trying pypdf...` đứng trước object JSON, nên bên gọi parse gãy. Đã vá bằng `contextlib.redirect_stdout(sys.stderr)` quanh lời gọi engine, và khoá lại bằng `test_stdout_chi_co_json`."
+    },
+    {
+      "van_de": "`pip install -r requirements-dev.txt` — lệnh chính skill bảo người dùng gõ — HỎNG trên Windows.",
+      "chi_tiet": "Chạy thật lần đầu (đúng finding của lens skill-quality: lệnh chưa từng ai gõ thử) cho `UnicodeDecodeError: 'charmap' codec can't decode byte 0x8d in position 195`. Nguyên nhân: file có comment tiếng Việt có dấu (UTF-8), mà pip đọc requirements bằng codec mặc định của hệ (cp1252 trên Windows). Đã vá bằng cách giữ `requirements-dev.txt` thuần ASCII. Sau khi vá, chạy lại trong venv sạch: mã thoát 0, `import book_to_skill` thành công, 17 đuôi hỗ trợ.",
+      "luu_y_them": "Lần chạy lại đầu tiên còn gặp `OSError ... enable-long-paths` — nhưng đó là artefact của đường dẫn scratchpad quá dài (giới hạn 260 ký tự của Windows), không phải lỗi của file. Dựng venv ở đường dẫn ngắn thì hết."
+    }
+  ],
+  "vong_review_step_04": {
+    "ghi_chu": "Bảy thay đổi hành vi đến từ vòng review, mỗi cái có bằng chứng ở trên. Ghi lại đây để lần sau biết cái gì tìm ra bằng cách nào.",
+    "thay_doi": [
+      "Bọc engine bằng `bin/giam-dinh.py`: ràng buộc 'không đưa nội dung sách vào ngữ cảnh' từ một lời dặn trở thành một cơ chế — `text` không có đường ra khỏi script. Khoá bằng `test_khoa_text_khong_bao_gio_ra_stdout`.",
+      "Ba phép kiểm đường dẫn chuyển vào script, và hai ca 'đường dẫn sai' / 'sách hỏng thật' ra hai MÃ THOÁT khác nhau — ranh giới quyết định có gửi thư sang vai khác hay không giờ là cơ chế, không phải lời dặn.",
+      "Chỉ khớp `filename` thì hỏi người học thay vì tự kết luận — trước đó hai cuốn khác nhau cùng tên file sẽ khiến Nhánh G cập nhật con trỏ sang cuốn khác rồi giữ số liệu giám định cũ.",
+      "Phép kiểm kho chuyển lên trước khi gọi script.",
+      "Nhánh 'người học không biết cấu trúc': hỏi lại một lần, rồi mặc định `chuoi` với cờ `mac_dinh`.",
+      "Tên file thư có hậu tố thời gian — trước đó gửi lại cùng cuốn lần hai sẽ ghi đè thư cũ.",
+      "SKILL.md từ 7.967 xuống 5.054 token (đo bằng tiktoken/cl100k_base): tách `references/dinh-dang.md` nạp khi tới bước ghi, và cắt các đoạn lý lẽ thiết kế sang Design Notes của story."
+    ]
+  }
+}
