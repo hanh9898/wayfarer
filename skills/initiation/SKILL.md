@@ -1,164 +1,165 @@
 ---
-name: nhap-mon
-description: Bái sư nhập môn Vấn Đạo. Dùng khi người học gõ /wayfarer:initiation — lần đầu cài plugin, muốn kiểm tra/đặt lại ngôn ngữ giao tiếp, hoặc chưa hoàn tất bái sư (đặt tên môn phái, khai vai/mạch, đặt tên 4 vai đồng hành). Bước đầu tiên của mọi hành trình học.
+name: initiation
+description: Take a master and enter the sect in Wayfarer. Use when the learner types /wayfarer:initiation — first install of the plugin, wanting to check or reset the communication language, or master-taking not yet finished (naming the sect, declaring role/meridian, naming the 4 companion roles). The first step of every learning journey.
 ---
 
-# Nhập môn
+# Initiation
 
-## Xong khi
+## Done when
 
-Ngôn ngữ giao tiếp (`communication_language`) đã được xác nhận (Bước 0), **và** nghi thức bái sư đã kích hoạt — nghĩa là hồ sơ có đủ tên môn phái, vai, mạch, tên riêng cho 4 vai nói-với-người-học, **và** một bản ghi nhập môn ký do chính người học tự gõ (`~/.wayfarer/initiation-record.md` có ít nhất một mục). Thiếu bất kỳ phần nào trong số này thì nói rõ đang dừng ở đâu, không coi là đã xong, không giả vờ bái sư đã kích hoạt khi chưa đủ.
+The communication language (`communication_language`) has been confirmed (Step 0), **and** the master-taking rite is active — meaning the profile holds a sect name, a role, a meridian, and personal names for the 4 roles that speak to the learner, **and** an initiation record the learner typed themselves (`~/.wayfarer/initiation-record.md` has at least one entry). If any of these is missing, say plainly where things stand, do not treat it as done, and do not pretend the master-taking rite is active when it is not.
 
-Chỉ điểm (Trưởng môn gọi tên sách cụ thể cho người học đi tìm) là bước nối tiếp ngay sau bái sư — sau khi đủ bốn phần dưới đây, dẫn người học sang `/wayfarer:sect-master` (xem Bước 6).
+Counsel (the Sect Master naming a specific book for the learner to go find) is the step that follows immediately after master-taking — once the four parts below are complete, point the learner to `/wayfarer:sect-master` (see Step 6).
 
-## Khi nào skill này không giúp được
+## When this skill does not help
 
-- Người học đã bái sư xong (đủ hồ sơ + nhập môn ký), chỉ muốn tiếp tục học một bí kíp đang dở — dùng `/wayfarer:seclusion` thay vì gọi lại `nhap-mon`.
-- Người học muốn được chỉ sách cụ thể ngay sau khi bái sư xong (chỉ điểm) — không phải việc của `nhap-mon`, dẫn sang `/wayfarer:sect-master`, không tự bịa tên sách để lấp chỗ trống.
-- Người học hỏi về đột phá cảnh giới/lên cấp, hay bất kỳ tính năng nào thuộc phần sau của lộ trình — chưa dựng ở bản này, trả lời rõ "chưa hỗ trợ ở bản này", không đoán liều, không im lặng bỏ qua — dù đang hỏi giữa lúc bái sư hay bất cứ lúc nào khác trong hội thoại.
-- Người học muốn nhờ chính skill này (hay bất kỳ vai nào) viết/soạn sẵn nội dung nhập môn ký để duyệt — không làm được dưới bất kỳ hình thức nào, kể cả chỉ gợi ý mẫu câu; từ chối và dẫn sang `/wayfarer:initiation-record` để người học tự gõ.
+- The learner has finished taking a master (profile plus initiation record) and only wants to continue an unfinished scripture — use `/wayfarer:seclusion` instead of calling `initiation` again.
+- The learner wants a specific book named right after finishing master-taking (counsel) — not the job of `initiation`; point them to `/wayfarer:sect-master`, and do not invent a book title to fill the gap.
+- The learner asks about realm breakthrough or levelling up, or any feature belonging to a later part of the path — not built in this version; answer plainly "not supported in this version", do not guess, do not silently skip — whether they ask in the middle of master-taking or at any other point in the conversation.
+- The learner asks this skill (or any role) to write or pre-draft the initiation record for them to approve — not possible in any form, not even as a suggested sample sentence; refuse and point them to `/wayfarer:initiation-record` so the learner types it themselves.
 
-## Trình → xác nhận → ghi → kiểm
+## Present, confirm, write, verify
 
-Bước 0 không ghi trạng thái mới nào (chỉ đọc `userConfig` đã có sẵn). Từ Bước 2 trở đi (đặt tên môn phái, khai vai/mạch, đặt tên 4 vai), mỗi lần ghi vào `~/.wayfarer/sect-master/profile.json` đều theo đúng trình tự: **trình** nội dung sắp ghi cho người học xem lại → **xác nhận** đồng ý → **ghi** (chỉ cập nhật đúng trường liên quan, không ghi đè âm thầm cả file — trường khác đã có trong hồ sơ giữ nguyên) → **kiểm** bằng cách đọc lại chính file vừa ghi. Đọc lại thấy lệch với thứ vừa xác nhận thì quay lại bước trình với đúng chỗ lệch làm ngữ cảnh, không coi là đã ghi xong.
+Step 0 writes no new state (it only reads the existing `userConfig`). From Step 2 onward (naming the sect, declaring role/meridian, naming the 4 roles), every write to `~/.wayfarer/sect-master/profile.json` follows the same order: **present** the content about to be written for the learner to review → **confirm** that they agree → **write** (update only the relevant field, never silently overwrite the whole file — other fields already in the profile stay as they are) → **verify** by reading back the very file just written. If the read-back differs from what was confirmed, return to the present step with the exact mismatch as context; do not treat the write as finished.
 
-Việc ghi nhập môn ký (`~/.wayfarer/initiation-record.md`) theo đúng bốn bước trên nhưng nằm ở skill riêng `nhap-mon-ky` — xem Bước 3 bên dưới, `nhap-mon` không bao giờ tự ghi file đó.
+Writing the initiation record (`~/.wayfarer/initiation-record.md`) follows the same four steps, but it lives in a separate skill, `initiation-record` — see Step 3 below. `initiation` never writes that file itself.
 
-## Nạp `customize.toml`
+## Load `customize.toml`
 
-Skill này chưa phơi field nào trong `customize.toml` — không có tuỳ biến ở phạm vi bản này.
+This skill exposes no field in `customize.toml` — no customization within the scope of this version.
 
-## Bước 0 — Kiểm ngôn ngữ giao tiếp
+## Step 0 — Check the communication language
 
-Giá trị `communication_language` người học đã cấu hình (Claude Code tự thế chỗ vào đây lúc nạp skill,
-không phải giá trị tĩnh khai trong `plugin.json`):
+The `communication_language` value the learner has configured (Claude Code substitutes it here when the
+skill loads; it is not the static value declared in `plugin.json`):
 
 ```
 ${user_config.communication_language}
 ```
 
-**Không đọc trực tiếp `.claude-plugin/plugin.json` để lấy giá trị này** — file đó chỉ khai *schema*
-(kiểu, tiêu đề, `default` gợi ý), không phải giá trị người học thật sự đã đặt; giá trị thật nằm ở
-`pluginConfigs["wayfarer@wayfarer"].options` trong `settings.json` của Claude Code, và cách đọc đúng
-là qua chỗ thế chỗ `${user_config.communication_language}` ở trên — đã verify chạy thật: đọc
-thẳng `plugin.json` luôn thấy `default: "Vietnamese"` bất kể người học đã cấu hình gì, nên không phân
-biệt được "chưa đặt" với "đã đặt đúng bằng giá trị mặc định".
+**Do not read `.claude-plugin/plugin.json` directly to get this value** — that file declares only the
+*schema* (type, title, a suggested `default`), not the value the learner actually set; the real value
+lives in `pluginConfigs["wayfarer@wayfarer"].options` in Claude Code's `settings.json`, and the correct
+way to read it is through the `${user_config.communication_language}` substitution above — verified by
+running it: reading `plugin.json` directly always shows `default: "Vietnamese"` no matter what the
+learner configured, so it cannot tell "not set" apart from "set to exactly the default value".
 
-- **Dòng thế chỗ ở trên hiện ra một giá trị ngôn ngữ cụ thể** (vd. `Vietnamese`, `English` — khác
-  với chuỗi placeholder `${user_config.communication_language}` y hệt bên trên): đó là giá trị đã
-  cấu hình — dùng ngay cho mọi phản hồi tiếp theo trong phiên này. Không hỏi lại người học — kể cả
-  ở phiên sau, vì đây là cấu hình plugin bền, Claude Code tự nạp lại.
-- **Dòng thế chỗ ở trên trống, hoặc vẫn còn nguyên văn placeholder `${user_config.communication_language}`
-  chưa được thế** (cả hai đều nghĩa là chưa có giá trị nào được cấu hình — cơ chế thế chỗ có thể để
-  trống hoặc giữ nguyên cú pháp khi field chưa set, không giả định cố định là dạng nào): nói rõ với
-  người học là chưa đặt ngôn ngữ giao tiếp, và hướng dẫn chạy:
+- **The substitution line above shows a concrete language value** (e.g. `Vietnamese`, `English` — as
+  opposed to the literal placeholder string `${user_config.communication_language}` reproduced just
+  above): that is the configured value — use it for every reply from here on in this session. Do not
+  ask the learner again — not even in a later session, because this is durable plugin configuration
+  that Claude Code reloads on its own.
+- **The substitution line above is empty, or still shows the literal placeholder `${user_config.communication_language}`
+  unsubstituted** (both mean no value has been configured — the substitution mechanism may leave the
+  line blank or leave the syntax intact when the field is unset, so do not assume one fixed form):
+  tell the learner plainly that the communication language is not set, and guide them to run:
 
   ```
   /plugin configure wayfarer@wayfarer
   ```
 
-  Đây là lệnh Claude Code cấp người dùng — skill không tự chạy được hộ. Sau khi người học chạy lệnh và đặt giá trị, gọi lại `/wayfarer:initiation` để tiếp tục.
+  This is a user-level Claude Code command — the skill cannot run it on their behalf. Once the learner has run it and set a value, call `/wayfarer:initiation` again to continue.
 
-**Không giả định Claude Code tự động hỏi khi bật plugin lần đầu** — đường cài qua CLI không kèm `--config` chỉ in cảnh báo, không chặn/hỏi (đã verify). Bước 0 này là nơi duy nhất chủ động kiểm tra và nhắc, không trông chờ cơ chế nào khác làm hộ.
+**Do not assume Claude Code asks automatically when the plugin is first enabled** — the CLI install path without `--config` only prints a warning; it does not block or prompt (verified). This Step 0 is the only place that actively checks and reminds; do not count on any other mechanism to do it instead.
 
-## Lưu ý xuyên suốt bái sư
+## Throughout master-taking
 
-Từ Bước 1 trở đi, bất cứ lúc nào người học hỏi về đột phá cảnh giới/lên cấp giữa lúc đang bái sư, trả lời ngay và rõ "chưa hỗ trợ ở bản này" — không đoán liều, không im lặng bỏ qua — rồi quay lại đúng bước đang dở, không để câu hỏi đó làm lạc hướng cả cuộc trò chuyện.
+From Step 1 onward, whenever the learner asks about realm breakthrough or levelling up in the middle of master-taking, answer immediately and plainly "not supported in this version" — do not guess, do not silently skip — then return to the exact step in progress, and do not let the question derail the whole conversation.
 
-## Bước 1 — Kiểm hồ sơ bái sư đã có tới đâu
+## Step 1 — Check how far the master-taking profile has got
 
-**Trước khi đọc/ghi bất kỳ đường dẫn nào dưới `~/.wayfarer/` trong phiên này, xác định đúng thư mục home hiện tại của máy đang chạy** (ví dụ `$env:USERPROFILE` trên Windows, `$HOME` trên POSIX) thay vì giả định sẵn một đường dẫn — không có gì đảm bảo con đường đó luôn giống lần trước. Dùng đúng một giá trị đã xác định cho toàn bộ các bước còn lại của phiên này.
+**Before reading or writing any path under `~/.wayfarer/` in this session, determine the actual home directory of the machine you are running on** (for example `$env:USERPROFILE` on Windows, `$HOME` on POSIX) rather than assuming a path — nothing guarantees it is the same as last time. Use that one determined value for every remaining step of this session.
 
-Đọc file `~/.wayfarer/sect-master/profile.json` (nếu có) và file `~/.wayfarer/initiation-record.md` (nếu có — chỉ đọc, không bao giờ ghi vào file này, xem Bước 3) để biết bốn phần dưới đây đã xong phần nào:
+Read `~/.wayfarer/sect-master/profile.json` (if it exists) and `~/.wayfarer/initiation-record.md` (if it exists — read only, never write to this file, see Step 3) to find out which of the four parts below are already done:
 
-| Phần | Đã xong khi |
+| Part | Done when |
 |---|---|
-| Tên môn phái | `ho-so.json` có trường `ten_mon_phai` không rỗng |
-| Nhập môn ký | `nhap-mon-ky.md` tồn tại và có ít nhất một mục ghi |
-| Vai + mạch | `ho-so.json` có cả `vai` và `mach` không rỗng |
-| Tên 4 vai | `ho-so.json` có `ten_vai` đủ bốn khoá: `truong-mon`, `tang-kinh-truong-lao`, `thu-linh`, `giam-khao` |
+| Sect name | `ho-so.json` has a non-empty `ten_mon_phai` field |
+| Initiation record | `nhap-mon-ky.md` exists and has at least one entry |
+| Role + meridian | `ho-so.json` has both `vai` and `mach` non-empty |
+| Names for the 4 roles | `ho-so.json` has `ten_vai` with all four keys: `truong-mon`, `tang-kinh-truong-lao`, `thu-linh`, `giam-khao` |
 
-- **Đủ cả bốn phần:** nghi thức bái sư đã kích hoạt từ trước. Không lặp lại bất kỳ câu hỏi nào ở các bước dưới đây — tóm tắt lại hồ sơ hiện có (tên môn phái, vai, mạch, tên 4 vai) cho người học, nói rõ đã bái sư xong, rồi dừng ở đây (xem Bước 6 để biết cách trả lời phần "bước tiếp theo").
-- **Thiếu một hay nhiều phần:** tiếp tục các bước dưới đây, nhưng **bỏ qua phần đã xong** — không hỏi lại thứ đã có sẵn trong hồ sơ. Thứ tự ưu tiên khi nhiều phần cùng thiếu: tên môn phái → nhập môn ký → vai + mạch → tên 4 vai.
+- **All four parts present:** the master-taking rite was already activated earlier. Do not repeat any question from the steps below — summarize the existing profile (sect name, role, meridian, names for the 4 roles) for the learner, say plainly that master-taking is finished, then stop here (see Step 6 for how to answer the "what comes next" part).
+- **One or more parts missing:** continue with the steps below, but **skip whatever is already done** — do not re-ask for anything already in the profile. Priority order when several are missing: sect name → initiation record → role + meridian → names for the 4 roles.
 
-## Bước 2 — Đặt tên môn phái
+## Step 2 — Name the sect
 
-Bỏ qua bước này nếu `ten_mon_phai` đã có trong hồ sơ (xem Bước 1).
+Skip this step if `ten_mon_phai` is already in the profile (see Step 1).
 
-Hỏi người học muốn đặt tên môn phái của mình là gì — một cái tên gọi vui để hồ sơ có bản sắc, không mang ý nghĩa kỹ thuật gì. Người học tự nhập tự do, không giới hạn hình thức.
+Ask the learner what they want to name their own sect — a playful name that gives the profile some identity; it carries no technical meaning. The learner types it freely, with no restriction on form.
 
-- Trình: nhắc lại đúng nguyên văn tên vừa nhận để người học soát (đề phòng gõ nhầm).
-- Xác nhận: hỏi lại một câu ngắn, đợi người học đồng ý.
-- Ghi: lưu vào trường `ten_mon_phai` trong `~/.wayfarer/sect-master/profile.json` (tạo file/thư mục nếu chưa có; nếu file đã tồn tại thì chỉ thêm/đổi đúng trường này, giữ nguyên các trường khác).
-- Kiểm: đọc lại file vừa ghi, xác nhận đúng tên vừa lưu.
+- Present: repeat the name received back verbatim so the learner can check it (in case of a typo).
+- Confirm: ask once, briefly, and wait for the learner to agree.
+- Write: save it to the `ten_mon_phai` field in `~/.wayfarer/sect-master/profile.json` (create the file and directory if absent; if the file already exists, add or change only this field and leave every other field as it is).
+- Verify: read back the file just written and confirm the name saved is the one agreed on.
 
-Đổi tên môn phái sau này (nếu người học muốn) chỉ thay giá trị trường này — không tạo hồ sơ mới, không đổi tên thư mục hay file nào; hồ sơ không được phép mất theo tên.
+Renaming the sect later (if the learner wants to) changes only this field's value — no new profile, no renamed directory or file; the profile must never be lost along with the name.
 
-## Bước 3 — Dẫn ghi nhập môn ký
+## Step 3 — Guide them to write the initiation record
 
-Bỏ qua bước này nếu `~/.wayfarer/initiation-record.md` đã có ít nhất một mục (xem Bước 1).
+Skip this step if `~/.wayfarer/initiation-record.md` already has at least one entry (see Step 1).
 
-Nhập môn ký là một lời cam kết nhập môn do chính người học tự tay gõ — không phải mẫu câu do AI soạn sẵn rồi người học chỉ việc duyệt qua. Nói rõ lý do với người học: cam kết chỉ dẫn dắt được hành trình khi là lời tự viết của chính người viết; một câu do người khác soạn hộ, dù nghe hay tới đâu, không tạo ra cùng hiệu ứng.
+The initiation record is a commitment to initiation typed by the learner's own hand — not a sentence the AI drafts in advance for the learner to skim and approve. Tell the learner why: a commitment can steer a journey only when it is the writer's own words; a sentence drafted by someone else, however good it sounds, does not produce the same effect.
 
-Hướng dẫn người học chạy đúng lệnh sau:
+Guide the learner to run exactly this command:
 
 ```
 /wayfarer:initiation-record
 ```
 
-Đây là skill riêng, **chỉ chạy được khi chính người học tự gõ lệnh này** — `nhap-mon` (skill hiện tại) không tự gọi hộ được, và tuyệt đối không được soạn sẵn nội dung nhập môn ký dưới bất kỳ hình thức nào, kể cả chỉ gợi ý một mẫu câu "cho dễ bắt đầu". Người học yêu cầu "viết hộ một câu" thì từ chối thẳng, giải thích đúng lý do trên, rồi vẫn dẫn về lệnh trên để họ tự gõ.
+This is a separate skill, and **it runs only when the learner types this command themselves** — `initiation` (the current skill) cannot call it on their behalf, and must never pre-draft initiation record content in any form, not even a single sample sentence "to make starting easier". If the learner asks you to "just write one sentence for me", refuse outright, explain exactly the reason above, and still point them back to the command so they type it themselves.
 
-Người học có thể chạy lệnh này ngay trong hội thoại tiếp theo, hoặc để dành cho phiên sau — hồ sơ và tiến độ bái sư không mất giữa các bước. Sau khi chạy xong, gọi lại `/wayfarer:initiation` để tiếp tục các bước còn lại; Bước 1 sẽ tự nhận ra phần này đã xong, không hỏi lại.
+The learner can run this command in the very next exchange, or leave it for a later session — the profile and the master-taking progress are not lost between steps. Once it is done, call `/wayfarer:initiation` again to continue the remaining steps; Step 1 will recognize this part as finished and will not ask again.
 
-Không có gì bắt buộc người học phải làm xong bước này trước khi sang Bước 4/5 nếu họ muốn tiếp tục luôn — chỉ cần nhớ nhắc rõ ở Bước 6 rằng nghi thức bái sư vẫn CHƯA kích hoạt cho tới khi bước này xong.
+Nothing forces the learner to finish this step before moving on to Step 4 or 5 if they want to keep going — just remember to state clearly at Step 6 that the master-taking rite is still NOT active until this step is done.
 
-## Bước 4 — Khai vai + mạch
+## Step 4 — Declare role + meridian
 
-Bỏ qua bước này nếu cả `vai` và `mach` đã có trong hồ sơ (xem Bước 1).
+Skip this step if both `vai` and `mach` are already in the profile (see Step 1).
 
-Hỏi người học: đã biết mình muốn luyện gì (vai + mạch) chưa?
+Ask the learner: do they already know what they want to train (role + meridian)?
 
-**Nhánh đã biết:** để người học tự khai thẳng cả vai (nghề nghiệp/vai trò đang làm, ví dụ tester, BA, lập trình viên) và mạch (kỹ năng/hướng muốn luyện, ví dụ kiểm thử phần mềm, phân tích nghiệp vụ) — không có danh sách cố định để chọn, người học nói gì ghi đúng nấy.
+**The "already knows" branch:** let the learner state both the role (the trade or role they currently work in, for example tester, BA, developer) and the meridian (the skill or direction they want to train, for example software testing, business analysis) directly — there is no fixed list to choose from; record exactly what the learner says.
 
-**Nhánh chưa biết** (người học nói "chưa biết"/"chưa rõ"/ý tương đương):
+**The "does not know yet" branch** (the learner says "don't know yet" / "not sure" / anything equivalent):
 
-1. Hỏi VAI trước — đúng tinh thần câu "ngươi làm nghề gì", **không hỏi mạch trước**: mạch là khái niệm của hệ, người mới không trả lời được.
-2. Từ vai vừa nhận, gợi ý một mạch phù hợp, kèm đúng mức tin cậy của gợi ý:
-   - Đã có dữ liệu thật từ nhiều người học cùng vai (khoảng từ 5 người trở lên) → gợi ý kèm số liệu cụ thể.
-   - Chưa có dữ liệu thật nhưng có nguồn tham chiếu cụ thể để dựa vào → gợi ý kèm nói rõ nguồn đó.
-   - Không có cả hai (đúng trạng thái hiện tại, kho còn mới) → gợi ý kèm cảnh báo rõ ràng: đây là suy đoán, chưa phải dữ liệu thật.
-   - Dù ở mức nào, luôn kèm lối "tự nhập mạch khác nếu gợi ý không hợp".
-3. Đưa gợi ý (kèm cờ nguồn ở trên) cho người học chọn, hoặc để họ tự nhập mạch khác — **không tự chốt mạch mà không hỏi lại người học**.
+1. Ask for the ROLE first — in the spirit of "what trade do you ply?" — and **do not ask for the meridian first**: the meridian is a concept internal to the system, and a newcomer cannot answer it.
+2. From the role just received, suggest a fitting meridian, labelled with the suggestion's actual confidence:
+   - Real data exists from several learners in the same role (roughly 5 or more) → suggest it with the concrete numbers.
+   - No real data, but a specific reference source to lean on → suggest it and name that source.
+   - Neither of the two (the current state — the store is still new) → suggest it with an explicit warning: this is inference, not real data.
+   - At every level, always include the way out: "type a different meridian if the suggestion does not fit".
+3. Offer the suggestion (carrying the source flag above) for the learner to choose, or let them type a different meridian — **never settle on a meridian without asking the learner**.
 
-- Trình: nhắc lại đúng vai + mạch (và nguồn: tự khai hay suy từ vai) vừa chốt.
-- Xác nhận: hỏi lại, đợi người học đồng ý trước khi ghi.
-- Ghi: lưu `vai`, `mach`, và `mach_nguon` (`tu_khai` nếu người học tự khai thẳng hoặc tự nhập ở nhánh chưa biết; `suy_tu_vai` nếu người học chọn đúng gợi ý suy từ vai) vào `~/.wayfarer/sect-master/profile.json`.
-- Kiểm: đọc lại file, xác nhận đúng vai/mạch/nguồn vừa lưu.
+- Present: repeat the role + meridian just settled on (and the source: self-declared, or inferred from the role).
+- Confirm: ask again and wait for the learner to agree before writing.
+- Write: save `vai`, `mach`, and `mach_nguon` (`tu_khai` if the learner declared it directly or typed their own in the "does not know yet" branch; `suy_tu_vai` if the learner accepted the suggestion inferred from the role) into `~/.wayfarer/sect-master/profile.json`.
+- Verify: read the file back and confirm the role, meridian and source saved are the ones agreed on.
 
-## Bước 5 — Đặt tên 4 vai
+## Step 5 — Name the 4 roles
 
-Bỏ qua bước này nếu `ten_vai` đã đủ bốn khoá trong hồ sơ (xem Bước 1).
+Skip this step if `ten_vai` already has all four keys in the profile (see Step 1).
 
-Chỉ đặt tên cho đúng bốn vai trực tiếp nói chuyện với người học: Trưởng môn, Tàng kinh trưởng lão, Thư linh, Giám khảo. Không hỏi tên cho bất kỳ vai nào khác — các vai còn lại không bao giờ hiện ra trước người học, đặt tên cho chúng không có ý nghĩa gì với người học.
+Name only the four roles that speak to the learner directly: Sect Master, Scripture Hall Elder, Thư linh, Giám khảo. Do not ask for a name for any other role — the rest never appear before the learner, so naming them means nothing to them.
 
-Gợi ý sẵn vài tên cho mỗi vai (ví dụ minh hoạ, không phải danh sách bắt buộc):
+Offer a few names for each role (illustrative examples, not a list they must pick from):
 
-- Trưởng môn: "Bạch Vân", "Huyền Cơ"
-- Tàng kinh trưởng lão: "Mặc Thư", "Tàng Vân"
+- Sect Master: "Bạch Vân", "Huyền Cơ"
+- Scripture Hall Elder: "Mặc Thư", "Tàng Vân"
 - Thư linh: "Nhã Tri", "Minh Tuệ"
 - Giám khảo: "Thanh Nghiêm", "Chính Trực"
 
-Người học chọn một trong các gợi ý, tự nhập tên khác, hoặc giữ nguyên tên vai gốc — cả ba đều hợp lệ, **không ép chọn từ danh sách**.
+The learner picks one of the suggestions, types a different name, or keeps the original role name — all three are valid, and **do not force a choice from the list**.
 
-- Trình: liệt kê lại đủ bốn cặp (tên vai gốc → tên người học chọn) để người học soát một lượt.
-- Xác nhận: hỏi lại, đợi đồng ý, cho sửa nếu người học đổi ý ở bất kỳ vai nào.
-- Ghi: lưu vào `ten_vai` trong `~/.wayfarer/sect-master/profile.json` với đúng bốn khoá kỹ thuật: `truong-mon`, `tang-kinh-truong-lao`, `thu-linh`, `giam-khao`.
-- Kiểm: đọc lại file, xác nhận đủ bốn khoá và đúng tên vừa lưu.
+- Present: list all four pairs (original role name → the name the learner chose) so the learner can review them in one pass.
+- Confirm: ask again, wait for agreement, and allow edits if the learner changes their mind on any role.
+- Write: save into `ten_vai` in `~/.wayfarer/sect-master/profile.json` under exactly these four technical keys: `truong-mon`, `tang-kinh-truong-lao`, `thu-linh`, `giam-khao`.
+- Verify: read the file back and confirm all four keys are present with the names just saved.
 
-## Bước 6 — Xác nhận bái sư
+## Step 6 — Confirm master-taking
 
-Đọc lại hồ sơ và `nhap-mon-ky.md` một lần nữa (giống cách kiểm ở Bước 1):
+Read the profile and `nhap-mon-ky.md` once more (the same check as in Step 1):
 
-- **Đủ cả bốn phần** (tên môn phái, nhập môn ký, vai + mạch, tên 4 vai): nói rõ nghi thức bái sư đã kích hoạt, tóm tắt lại toàn bộ hồ sơ vừa xong cho người học bằng đúng tên 4 vai họ vừa đặt. Dẫn tường minh sang bước tiếp theo: mời người học tự gõ `/wayfarer:sect-master` để nhận chỉ điểm sách cụ thể — không tự động chuyển sang, không tự gọi hộ; nếu người học hỏi luôn "vậy giờ học gì", trả lời bằng đúng lời mời gọi lệnh trên, không tự bịa tên sách ngay tại đây.
-- **Thiếu đúng phần nhập môn ký, các phần còn lại đã đủ:** nói rõ **nghi thức bái sư CHƯA kích hoạt** — không giả vờ đã xong dù vai/mạch/tên 4 vai đã có đủ — nhắc lại đúng một lần lệnh `/wayfarer:initiation-record`, nhưng không chặn cuộc trò chuyện dừng lại ở đây nếu người học chưa muốn làm ngay.
-- **Còn thiếu phần khác** (tên môn phái, hoặc vai/mạch, hoặc tên 4 vai): chưa tới lúc xác nhận — quay lại đúng bước tương ứng ở trên trước.
+- **All four parts present** (sect name, initiation record, role + meridian, names for the 4 roles): say plainly that the master-taking rite is active, and summarize the whole finished profile for the learner using the exact names they gave the 4 roles. Point explicitly to the next step: invite the learner to type `/wayfarer:sect-master` themselves to receive counsel on a specific book — do not switch over automatically, do not call it on their behalf; if the learner immediately asks "so what do I study now", answer with exactly that invitation to run the command, and do not invent a book title here.
+- **Only the initiation record is missing, every other part present:** say plainly that **the master-taking rite is NOT active** — do not pretend it is finished just because the role, meridian and names for the 4 roles are all there — mention the `/wayfarer:initiation-record` command exactly once, but do not block the conversation here if the learner does not want to do it right away.
+- **Some other part is missing** (sect name, or role/meridian, or names for the 4 roles): it is not time to confirm — return to the corresponding step above first.

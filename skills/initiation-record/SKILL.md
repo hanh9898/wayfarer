@@ -1,53 +1,53 @@
 ---
-name: nhap-mon-ky
-description: Ghi nhập môn ký — lời cam kết nhập môn do chính người học tự tay gõ, một phần của nghi thức bái sư. Chỉ chạy khi người học tự gõ lệnh /wayfarer:initiation-record; không skill hay vai nào khác gọi được hộ, không soạn sẵn nội dung để duyệt.
+name: initiation-record
+description: Write the initiation record — the initiation commitment typed by the learner's own hand, part of the rite of taking a master. Runs only when the learner types /wayfarer:initiation-record themselves; no other skill or role may call it on their behalf, and no content is drafted in advance for them to approve.
 disable-model-invocation: true
 ---
 
-# Nhập môn ký
+# Initiation Record
 
-## Xong khi
+## Done when
 
-Đã ghi được ít nhất một mục vào `~/.wayfarer/initiation-record.md`, nguyên văn đúng những gì người học tự gõ trong chính lượt hội thoại này — không thêm, không bớt, không "viết lại cho hay hơn", không sửa cả lỗi chính tả. Người học có thể gọi lại skill này nhiều lần để thêm mục mới ở phiên sau; mỗi lần là một mục ghi mới, không sửa mục cũ.
+At least one entry has been written to `~/.wayfarer/initiation-record.md`, word for word as the learner typed it in this very conversation turn — nothing added, nothing removed, no "rewriting it better", not even a spelling fix. The learner may call this skill again to add new entries in later sessions; each call is a new entry, never an edit to an old one.
 
-## Khi nào skill này không giúp được
+## When this skill does not help
 
-- Người học muốn AI viết hộ, gợi ý mẫu câu, hay "chỉnh câu cho mượt" rồi ghi — từ chối thẳng: cam kết chỉ có giá trị khi là lời của chính người học; một câu do người khác (kể cả AI) soạn sẵn để duyệt không còn là cam kết của người học đó nữa. Chờ người học tự gõ lại bằng lời của chính mình, không tự đề xuất nội dung thay.
-- Người học chưa gõ gì, chỉ hỏi "nhập môn ký là gì" — trả lời ngắn gọn ý nghĩa (lời cam kết nhập môn tự tay viết), rồi chờ người học tự gõ, không tự đưa ra nội dung mẫu.
-- Người học muốn sửa hoặc xoá một mục đã ghi trước đó — skill này chỉ thêm mục mới (ghi nối thêm), không sửa hay xoá mục cũ; nói rõ giới hạn này nếu được hỏi.
-- Người học hỏi về các phần khác của bái sư (tên môn phái, vai/mạch, tên 4 vai) — không thuộc phạm vi skill này, dẫn về `/wayfarer:initiation`.
+- The learner wants the AI to write it for them, to suggest a phrasing, or to "smooth out the sentence" before writing it down — refuse outright: a commitment only has value when it is the learner's own words; a sentence drafted by someone else (the AI included) and merely approved is no longer that learner's commitment. Wait for the learner to type it again in their own words; do not offer replacement content.
+- The learner has typed nothing yet and only asks "what is an initiation record" — answer briefly what it means (an initiation commitment written by one's own hand), then wait for the learner to type it; do not offer sample content.
+- The learner wants to edit or delete an entry written earlier — this skill only adds new entries (append only); it does not edit or delete old ones. State this limit plainly if asked.
+- The learner asks about other parts of taking a master (sect name, roles/meridians, the names of the 4 roles) — out of scope for this skill; point them to `/wayfarer:initiation`.
 
-## Trình → xác nhận → ghi → kiểm
+## Present, confirm, write, verify
 
-**Trước khi đọc/ghi `~/.wayfarer/initiation-record.md`, xác định đúng thư mục home hiện tại của máy đang chạy** (ví dụ `$env:USERPROFILE` trên Windows, `$HOME` trên POSIX) thay vì giả định sẵn một đường dẫn.
+**Before reading or writing `~/.wayfarer/initiation-record.md`, determine the actual home directory of the machine you are running on** (for example `$env:USERPROFILE` on Windows, `$HOME` on POSIX) instead of assuming a fixed path.
 
-1. **Trình:** yêu cầu người học tự gõ nguyên văn lời cam kết nhập môn của họ ngay trong lượt trả lời tiếp theo — nói rõ đây phải là lời của chính họ, không phải câu AI gợi ý. Sau khi nhận được, lặp lại đúng nguyên văn (không sửa một chữ nào, kể cả lỗi chính tả) để người học soát lại.
-2. **Xác nhận:** hỏi đúng một câu ngắn (ví dụ "ghi đúng như trên chứ?"), chờ người học đồng ý. Người học muốn sửa thì quay lại bước 1 với đúng bản họ tự gõ lại — không phải bản AI sửa hộ.
-3. **Ghi:** thêm một mục mới vào cuối `~/.wayfarer/initiation-record.md` (tạo file nếu chưa có), theo khuôn:
+1. **Present:** ask the learner to type their initiation commitment verbatim in their next reply — say plainly that this must be their own words, not a sentence the AI suggested. Once received, repeat it back exactly as written (not one character changed, spelling errors included) so the learner can check it.
+2. **Confirm:** ask exactly one short question (for example "write it down exactly as above?") and wait for the learner to agree. If the learner wants a change, go back to step 1 with the version they retyped themselves — not a version the AI fixed for them.
+3. **Write:** append a new entry to the end of `~/.wayfarer/initiation-record.md` (creating the file if it does not exist), in this shape:
 
    ```
-   ## <thời điểm ghi, ISO 8601 kèm offset múi giờ — vd. 2026-08-27T12:31:57+07:00 hoặc ...Z nếu UTC>
+   ## <time of writing, ISO 8601 with timezone offset — e.g. 2026-08-27T12:31:57+07:00, or ...Z for UTC>
 
-   <nguyên văn lời người học>
+   <the learner's words, verbatim>
    ```
 
-   Chỉ nối thêm — không ghi đè hay xoá các mục đã có.
-4. **Kiểm:** đọc lại chính mục vừa ghi từ file, in ra cho người học thấy đúng những gì vừa được lưu. Lệch dù chỉ một chữ so với bản đã xác nhận ở bước 2 thì coi là chưa xong — sửa lại và ghi lại, không để sai lệch tồn tại.
+   Append only — never overwrite or delete existing entries.
+4. **Verify:** read back the entry you just wrote from the file and print it for the learner, so they see exactly what was stored. If it differs from the text confirmed in step 2 by even one character, the job is not done — fix it and write it again; do not leave the discrepancy standing.
 
-Sau khi ghi xong, nếu người học chưa hoàn tất các phần khác của bái sư (tên môn phái, vai/mạch, tên 4 vai), nhắc một câu ngắn để họ quay lại `/wayfarer:initiation` tiếp tục — không bắt buộc, chỉ nhắc.
+Once written, if the learner has not finished the other parts of taking a master (sect name, roles/meridians, the names of the 4 roles), give one short reminder to return to `/wayfarer:initiation` and continue — a reminder, not a requirement.
 
-**Không vai hay skill nào khác được ghi vào `~/.wayfarer/initiation-record.md`** — kể cả `nhap-mon`, dù nó là nơi dẫn người học tới đây. `nhap-mon` chỉ được đọc file này để biết đã có mục nào chưa (phục vụ việc kiểm điều kiện kích hoạt bái sư), không bao giờ ghi.
+**No other role or skill may write to `~/.wayfarer/initiation-record.md`** — `initiation` included, even though it is what sends the learner here. `initiation` may only read this file to find out whether any entry exists yet (to check the trigger conditions for taking a master); it never writes.
 
-## Nạp `customize.toml`
+## Load `customize.toml`
 
-Skill này chưa phơi field nào trong `customize.toml` — không có tuỳ biến ở phạm vi bản này.
+This skill exposes no field in `customize.toml` — no customization at this version's scope.
 
-## Vì sao phải tự tay gõ, và khoá ở tầng nào
+## Why it must be typed by hand, and which layer the lock sits at
 
-Một cam kết tự viết trước khi bắt tay vào việc giúp người viết dễ theo đuổi việc đó hơn — hiệu ứng này đến từ chính hành động tự đặt bút, không đến từ nội dung câu chữ. Một câu do người khác soạn sẵn rồi chỉ việc duyệt qua, dù nghe hay tới đâu, không tạo ra cùng hiệu ứng, vì người duyệt không phải người đã tự cam kết.
+A commitment you write yourself before starting a piece of work makes it easier to stay with that work — the effect comes from the act of setting it down yourself, not from the wording. A sentence drafted by someone else and merely approved, however well phrased, does not produce the same effect, because the person approving is not the person who committed.
 
-Vì lý do đó, `disable-model-invocation` được bật ở đúng skill này (không bật ở `nhap-mon`): thuộc tính này áp cho toàn bộ skill, nên phải tách riêng khỏi `nhap-mon` — nếu gộp chung một file, cả phần kiểm ngôn ngữ giao tiếp ở Bước 0 của `nhap-mon` cũng bị khoá theo, trong khi phần đó vẫn cần tự kích hoạt bình thường khi người học gõ `/wayfarer:initiation`. Tách skill là cách duy nhất khoá đúng một hành vi (tự ghi nhập môn ký) mà không khoá nhầm hành vi khác.
+For that reason, `disable-model-invocation` is set on this skill specifically (and not on `initiation`): the attribute applies to a whole skill, so it has to be split out from `initiation` — merged into one file, the communication-language check in Step 0 of `initiation` would be locked along with it, while that part still needs to self-activate normally when the learner types `/wayfarer:initiation`. Splitting the skill is the only way to lock exactly one behavior (writing the initiation record oneself) without locking a different one by accident.
 
-`disable-model-invocation` khoá đúng một việc, ở đúng tầng cơ chế: skill này không tự nạp được qua khớp `description` — chỉ chạy khi người học tự gõ nguyên văn `/wayfarer:initiation-record`. Đây là cơ chế Claude Code thật, không phải quy ước, nên `nhap-mon` — hay bất kỳ vai/skill nào khác — không tự *kích hoạt* được skill này hộ người học.
+`disable-model-invocation` locks exactly one thing, at the right mechanical layer: this skill cannot load itself by `description` match — it runs only when the learner types `/wayfarer:initiation-record` verbatim. This is a real Claude Code mechanism, not a convention, so `initiation` — or any other role or skill — cannot *activate* this skill on the learner's behalf.
 
-Việc còn lại — không soạn sẵn nội dung để người học duyệt qua, không tự ghi thẳng vào `~/.wayfarer/initiation-record.md` bằng đường khác — không có cơ chế nền tảng nào chặn; đây là quy ước, giữ bằng chính hướng dẫn trong file này và dòng cấm ghi ở `nhap-mon/SKILL.md`. Một vai AI đọc sai hoặc cố tình bỏ qua hướng dẫn đó — tự ý ghi thẳng file bằng công cụ khác, hoặc tự đề xuất câu cam kết ngay trong lượt trả lời của `nhap-mon` mà không bao giờ gọi tới skill này — vẫn qua mặt được, vì không có gì ở tầng nền tảng ngăn lại. Hai tầng khác nhau: khoá *invocation* là cơ chế đã xác minh; khoá *nội dung* là quy ước, chỉ mạnh bằng việc các skill khác có đọc và tuân theo hướng dẫn hay không.
+The rest — not drafting content for the learner to approve, not writing straight into `~/.wayfarer/initiation-record.md` by some other route — has no platform mechanism blocking it; that is convention, held up by the instructions in this file and the write prohibition in `initiation/SKILL.md`. An AI role that misreads or deliberately ignores those instructions — writing the file directly with another tool, or proposing commitment wording inside an `initiation` reply and never calling this skill at all — still gets through, because nothing at the platform layer stops it. Two different layers: the *invocation* lock is a verified mechanism; the *content* lock is a convention, only as strong as whether other skills read and follow the instructions.
