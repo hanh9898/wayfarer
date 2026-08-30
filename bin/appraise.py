@@ -93,33 +93,33 @@ def main():
 
     # Chuẩn hoá về tuyệt đối trước mọi phép kiểm: `is_file()` trên đường dẫn tương
     # đối phụ thuộc thư mục làm việc, mà thư mục làm việc của skill không đoán được.
-    duong_dan = Path(sys.argv[1]).expanduser()
+    path = Path(sys.argv[1]).expanduser()
     try:
-        duong_dan = duong_dan.resolve()
+        path = path.resolve()
     except OSError as e:
-        emit("not_a_file", 1, path=str(duong_dan), message=str(e))
+        emit("not_a_file", 1, path=str(path), message=str(e))
 
     # Phép kiểm 1 — là file thật, không phải thư mục.
     # `exists()` trả True cho một thư mục tên `sach.epub`; nó sẽ lọt xuống engine
     # rồi lĩnh ExtractionError và bị gán oan là bản hỏng.
-    if not duong_dan.is_file():
-        emit("not_a_file", 1, path=str(duong_dan))
+    if not path.is_file():
+        emit("not_a_file", 1, path=str(path))
 
     # Phép kiểm 2 — đuôi nằm trong danh sách engine nhận, SO SAU KHI HẠ CHỮ THƯỜNG.
     # Hằng số chỉ chứa đuôi chữ thường, nên so thẳng sẽ từ chối oan một `.EPUB` tốt.
-    duoi = duong_dan.suffix.lower()
+    duoi = path.suffix.lower()
     if duoi not in config.SUPPORTED_EXTENSIONS:
         emit(
             "unsupported_extension",
             1,
-            path=str(duong_dan),
-            extension=duong_dan.suffix,
+            path=str(path),
+            extension=path.suffix,
             accepted_extensions=sorted(config.SUPPORTED_EXTENSIONS),
         )
 
     # Phép kiểm 3 — kích thước lớn hơn 0.
-    if duong_dan.stat().st_size == 0:
-        emit("empty_file", 1, path=str(duong_dan))
+    if path.stat().st_size == 0:
+        emit("empty_file", 1, path=str(path))
 
     # Engine in tiến trình ("Extracting EPUB: ...", "Trying pypdf...") thẳng ra
     # stdout. Không chặn thì nó lẫn vào JSON và bên gọi parse gãy — đã gặp thật ở
@@ -127,12 +127,12 @@ def main():
     # còn stdout giữ đúng một object JSON.
     try:
         with contextlib.redirect_stdout(sys.stderr):
-            ket_qua = book_to_skill.extract_single_file(duong_dan, "text", "no")
+            ket_qua = book_to_skill.extract_single_file(path, "text", "no")
     except book_to_skill.ExtractionError as e:
         # Ba phép kiểm đã qua, nên đây mới là bản hỏng thật. Chuỗi lỗi trả về cho
         # người đọc hiểu chuyện gì, KHÔNG để phân loại lỗi bằng cách so chuỗi —
         # chuỗi đó không phải hợp đồng ổn định giữa các phiên bản engine.
-        emit("extraction_failed", 2, path=str(duong_dan), message=str(e))
+        emit("extraction_failed", 2, path=str(path), message=str(e))
 
     so_lieu = {k: ket_qua[k] for k in METRIC_KEYS if k in ket_qua}
 
@@ -141,7 +141,7 @@ def main():
         so_lieu["chapter_headings_sample"] = mau[:SAMPLE_TITLE_COUNT]
         so_lieu["chapter_headings_da_cat"] = len(mau) - SAMPLE_TITLE_COUNT
 
-    emit("ok", 0, path=str(duong_dan), metrics=so_lieu)
+    emit("ok", 0, path=str(path), metrics=so_lieu)
 
 
 if __name__ == "__main__":

@@ -74,10 +74,10 @@ Read `~/.wayfarer/sect-master/profile.json` (if it exists) and `~/.wayfarer/init
 
 | Part | Done when |
 |---|---|
-| Sect name | `ho-so.json` has a non-empty `ten_mon_phai` field |
-| Initiation record | `nhap-mon-ky.md` exists and has at least one entry |
-| Role + meridian | `ho-so.json` has both `vai` and `mach` non-empty |
-| Names for the 4 roles | `ho-so.json` has `ten_vai` with all four keys: `truong-mon`, `tang-kinh-truong-lao`, `thu-linh`, `giam-khao` |
+| Sect name | `profile.json` has a non-empty `ten_mon_phai` field |
+| Initiation record | `initiation-record.md` exists and has at least one entry |
+| Role + meridian | `profile.json` has both `vai` and `mach` non-empty |
+| Names for the 4 roles | `profile.json` has `role_names` with all four keys: `sect-master`, `scripture-hall-elder`, `tome-spirit`, `examiner` |
 
 - **All four parts present:** the master-taking rite was already activated earlier. Do not repeat any question from the steps below — summarize the existing profile (sect name, role, meridian, names for the 4 roles) for the learner, say plainly that master-taking is finished, then stop here (see Step 6 for how to answer the "what comes next" part).
 - **One or more parts missing:** continue with the steps below, but **skip whatever is already done** — do not re-ask for anything already in the profile. Priority order when several are missing: sect name → initiation record → role + meridian → names for the 4 roles.
@@ -133,32 +133,32 @@ Ask the learner: do they already know what they want to train (role + meridian)?
 
 - Present: repeat the role + meridian just settled on (and the source: self-declared, or inferred from the role).
 - Confirm: ask again and wait for the learner to agree before writing.
-- Write: save `vai`, `mach`, and `mach_nguon` (`tu_khai` if the learner declared it directly or typed their own in the "does not know yet" branch; `suy_tu_vai` if the learner accepted the suggestion inferred from the role) into `~/.wayfarer/sect-master/profile.json`.
+- Write: save `vai`, `mach`, and `meridian_source` (`self_declared` if the learner declared it directly or typed their own in the "does not know yet" branch; `inferred_from_role` if the learner accepted the suggestion inferred from the role) into `~/.wayfarer/sect-master/profile.json`.
 - Verify: read the file back and confirm the role, meridian and source saved are the ones agreed on.
 
 ## Step 5 — Name the 4 roles
 
-Skip this step if `ten_vai` already has all four keys in the profile (see Step 1).
+Skip this step if `role_names` already has all four keys in the profile (see Step 1).
 
-Name only the four roles that speak to the learner directly: Sect Master, Scripture Hall Elder, Thư linh, Giám khảo. Do not ask for a name for any other role — the rest never appear before the learner, so naming them means nothing to them.
+Name only the four roles that speak to the learner directly: Sect Master, Scripture Hall Elder, Tome Spirit, Examiner. Do not ask for a name for any other role — the rest never appear before the learner, so naming them means nothing to them.
 
 Offer a few names for each role (illustrative examples, not a list they must pick from):
 
 - Sect Master: "Bạch Vân", "Huyền Cơ"
 - Scripture Hall Elder: "Mặc Thư", "Tàng Vân"
-- Thư linh: "Nhã Tri", "Minh Tuệ"
-- Giám khảo: "Thanh Nghiêm", "Chính Trực"
+- Tome Spirit: "Nhã Tri", "Minh Tuệ"
+- Examiner: "Thanh Nghiêm", "Chính Trực"
 
 The learner picks one of the suggestions, types a different name, or keeps the original role name — all three are valid, and **do not force a choice from the list**.
 
 - Present: list all four pairs (original role name → the name the learner chose) so the learner can review them in one pass.
 - Confirm: ask again, wait for agreement, and allow edits if the learner changes their mind on any role.
-- Write: save into `ten_vai` in `~/.wayfarer/sect-master/profile.json` under exactly these four technical keys: `truong-mon`, `tang-kinh-truong-lao`, `thu-linh`, `giam-khao`.
+- Write: save into `role_names` in `~/.wayfarer/sect-master/profile.json` under exactly these four technical keys: `sect-master`, `scripture-hall-elder`, `tome-spirit`, `examiner`.
 - Verify: read the file back and confirm all four keys are present with the names just saved.
 
 ## Step 6 — Confirm master-taking
 
-Read the profile and `nhap-mon-ky.md` once more (the same check as in Step 1):
+Read the profile and `initiation-record.md` once more (the same check as in Step 1):
 
 - **All four parts present** (sect name, initiation record, role + meridian, names for the 4 roles): say plainly that the master-taking rite is active, and summarize the whole finished profile for the learner using the exact names they gave the 4 roles. Point explicitly to the next step: invite the learner to type `/wayfarer:sect-master` themselves to receive counsel on a specific book — do not switch over automatically, do not call it on their behalf; if the learner immediately asks "so what do I study now", answer with exactly that invitation to run the command, and do not invent a book title here.
 - **Only the initiation record is missing, every other part present:** say plainly that **the master-taking rite is NOT active** — do not pretend it is finished just because the role, meridian and names for the 4 roles are all there — mention the `/wayfarer:initiation-record` command exactly once, but do not block the conversation here if the learner does not want to do it right away.

@@ -1,9 +1,9 @@
 pyyaml
 pytest
 
-# Sach engine (PDF/EPUB -> text + metadata), dung boi skill thu-bi-kip.
+# Sach engine (PDF/EPUB -> text + metadata), dung boi skill scripture-intake.
 # Ghim theo commit SHA, khong theo tag: tag di chuyen duoc, SHA thi khong.
-# Doi ban thi chay lai eval cua thu-bi-kip; hinh dang dict tra ve khong phai
+# Doi ban thi chay lai eval cua scripture-intake; hinh dang dict tra ve khong phai
 # hop dong on dinh. Ly do day du: xem Design Notes cua story 1.4.
 #
 # LUU Y: file nay giu thuan ASCII co chu dich. pip doc requirements bang codec

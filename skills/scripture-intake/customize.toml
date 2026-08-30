@@ -1,20 +1,22 @@
-# Bề mặt tuỳ biến của skill thu-bi-kip — lớp gốc, theo plugin, ghi đè mỗi lần cập nhật.
+# Customization surface for the scripture-intake skill — base layer, ships with the plugin,
+# overwritten on every update.
 #
-# Lớp cá nhân (sửa được): ~/.wayfarer/custom/scripture-intake.toml — ghi THƯA, chỉ trường muốn đổi.
-# Ví dụ một file cá nhân hợp lệ, chép được nguyên xi:
+# Personal layer (yours to edit): ~/.wayfarer/custom/scripture-intake.toml — write SPARSELY,
+# only the fields you want to change. A valid personal file, copy it as-is:
 #
-#     [ngan_sach_token]
-#     nang = 100000
+#     [token_budget]
+#     heavy = 100000
 #
-# Gộp ra: nhe = 60000 (giữ của lớp gốc), nang = 100000 (lớp cá nhân đè).
+# Merged result: light = 60000 (kept from the base layer), heavy = 100000 (personal layer wins).
 #
-# Chỉ ngan_sach_token được phơi ra ở bản này. Hai trường bi_kip_template và pha2_reviewers
-# thuộc thu-bi-kip theo tài liệu thiết kế chung, nhưng cả hai chỉ có nghĩa ở pha thiết kế
-# sư phạm — pha đó chưa dựng, nên không có bước đọc nào dùng tới. Cố ý để trống, không bịa.
+# Only token_budget is exposed in this version. The two fields scripture_template and
+# phase2_reviewers belong to scripture-intake per the overall design document, but both mean
+# something only in the pedagogy-design phase — that phase is not built, so no step reads them.
+# Deliberately left out rather than invented.
 
-[ngan_sach_token]
-# Mốc so sánh khi ước chi phí ở phép giám định thứ tư. Đơn vị: token của toàn bộ chữ rút
-# ra được, KHÔNG phải chi phí rút chữ — rút chữ chỉ vài giây kể cả sách 500 trang.
-# Phải giữ nhe < nang; skill kiểm điều này sau khi gộp và cảnh báo nếu bị đảo.
-nhe = 60000    # dưới mức này: sách mỏng, pha sau chạy thoải mái
-nang = 150000  # trên mức này: sách nặng, nói trước để người học biết pha sau tốn nhiều lượt
+[token_budget]
+# Comparison marks for the cost estimate in the fourth appraisal. Unit: tokens of all the text
+# extracted, NOT the cost of extracting it — extraction takes seconds even for a 500-page book.
+# light must stay below heavy; the skill checks this after merging and warns if they are inverted.
+light = 60000   # below this: a thin book, later phases run comfortably
+heavy = 150000  # above this: a heavy book, say so up front so the learner expects many turns later

@@ -2,7 +2,7 @@
 
 **schema: 1** · Đi kèm `../../docs/VAN-DAO-dac-ta-v1.0.md` · Vị trí trong plugin: `reference/scripture.schema.md`
 
-Đây là **hợp đồng** giữa bên thu sách (Thủ khố, pha 2–3) và bên dạy (Thư linh, Giám khảo, nghiệm công). Mọi thứ khác trong hệ đứng lên file này.
+Đây là **hợp đồng** giữa bên thu sách (Thủ khố, pha 2–3) và bên dạy (Tome Spirit, Examiner, nghiệm công). Mọi thứ khác trong hệ đứng lên file này.
 
 `validate-scripture.py` thực thi phần kiểm được bằng máy. Phần cần phán đoán ghi ở §7.
 
@@ -270,7 +270,7 @@ Trường này **được phép rỗng lúc thu**. Nó tự đầy lên qua lớ
 
 **Tàn quyển:** năm trường ở §3.2 **vắng mặt**; trường sư phạm có ở cấp gốc.
 
-**Con trỏ:** `nguon_file.duong_dan` tồn tại và `fingerprint` khớp — không khớp thì báo **gãy con trỏ**, không báo lỗi lược đồ.
+**Con trỏ:** `nguon_file.path` tồn tại và `fingerprint` khớp — không khớp thì báo **gãy con trỏ**, không báo lỗi lược đồ.
 
 ---
 

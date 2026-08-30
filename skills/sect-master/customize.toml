@@ -1,12 +1,15 @@
-# Bề mặt tuỳ biến của skill truong-mon — lớp gốc, theo plugin, ghi đè mỗi lần cập nhật.
-# Lớp cá nhân (sửa được): ~/.wayfarer/custom/sect-master.toml — chỉ ghi trường muốn đổi (override thưa),
-# gộp theo luật: scalar ghi đè, đọc chi tiết cách gộp ở truong-mon/SKILL.md mục "Nạp customize.toml".
+# Customization surface for the sect-master skill — base layer, ships with the plugin,
+# overwritten on every update.
+# Personal layer (yours to edit): ~/.wayfarer/custom/sect-master.toml — write only the fields you
+# want to change (sparse override), merged by rule: scalars overwrite. Full merge rules are in
+# sect-master/SKILL.md under "Load customize.toml".
 #
-# Chỉ so_chi_diem được phơi ra ở bản này. persistent_facts và catalog_them thuộc truong-mon
-# theo tài liệu thiết kế chung nhưng chưa có bước đọc nào dùng tới — cố ý để trống, không bịa field.
+# Only counsel_count is exposed in this version. persistent_facts and catalog_them belong to
+# sect-master per the overall design document, but no step reads them yet — deliberately left
+# out rather than invented.
 
-[so_chi_diem]
-# Nhánh "đã biết muốn luyện gì" (mach_nguon = tu_khai trong ho-so.json)
-da_biet = { cong_phap = 3, tam_phap = 2 }
-# Nhánh "chưa biết muốn luyện gì" (mach_nguon = suy_tu_vai trong ho-so.json)
-chua_biet = { cong_phap = 1, tam_phap = 1 }
+[counsel_count]
+# Branch "already knows what to train" (meridian_source = self_declared in profile.json)
+decided = { technique = 3, heart-method = 2 }
+# Branch "does not yet know what to train" (meridian_source = inferred_from_role in profile.json)
+undecided = { technique = 1, heart-method = 1 }

@@ -29,10 +29,10 @@ can_sach = pytest.mark.skipif(
 )
 
 
-def chay(duong_dan):
+def chay(path):
     """Chạy script, trả (mã thoát, object JSON đã parse từ stdout)."""
     r = subprocess.run(
-        [sys.executable, str(SCRIPT), str(duong_dan)],
+        [sys.executable, str(SCRIPT), str(path)],
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -80,7 +80,7 @@ def test_duoi_viet_hoa_van_nhan(tmp_path):
     assert d["status"] == "ok"
 
 
-def test_thu_muc_doi_lot_file_khong_phai_ban_hong(tmp_path):
+def test_thu_muc_doi_lot_file_khong_phai_damaged_copy(tmp_path):
     """`exists()` trả True cho thư mục này; nó không được lọt xuống engine."""
     d_muc = tmp_path / "thumuc.epub"
     d_muc.mkdir()
@@ -89,7 +89,7 @@ def test_thu_muc_doi_lot_file_khong_phai_ban_hong(tmp_path):
     assert d["status"] == "not_a_file"
 
 
-def test_duoi_la_khong_phai_ban_hong(tmp_path):
+def test_duoi_la_khong_phai_damaged_copy(tmp_path):
     f = tmp_path / "ghi-chu.xyz"
     f.write_text("linh tinh", encoding="utf-8")
     ma, d = chay(f)
@@ -98,7 +98,7 @@ def test_duoi_la_khong_phai_ban_hong(tmp_path):
     assert ".epub" in d["accepted_extensions"], "danh sách phải lấy từ chính engine"
 
 
-def test_file_rong_khong_phai_ban_hong(tmp_path):
+def test_file_rong_khong_phai_damaged_copy(tmp_path):
     f = tmp_path / "rong.epub"
     f.touch()
     ma, d = chay(f)
@@ -106,14 +106,14 @@ def test_file_rong_khong_phai_ban_hong(tmp_path):
     assert d["status"] == "empty_file"
 
 
-def test_duong_dan_khong_ton_tai_khong_phai_ban_hong(tmp_path):
+def test_path_khong_ton_tai_khong_phai_damaged_copy(tmp_path):
     ma, d = chay(tmp_path / "khong-co-that.epub")
     assert ma == 1
     assert d["status"] == "not_a_file"
 
 
 @can_sach
-def test_ban_hong_that_ra_ma_thoat_rieng(tmp_path):
+def test_damaged_copy_that_ra_ma_thoat_rieng(tmp_path):
     """EPUB đổi đuôi thành .pdf: qua cả ba phép kiểm rồi mới hỏng ở engine.
 
     Đây là ca DUY NHẤT được phép sinh ra một lá thư báo bản hỏng.
@@ -126,7 +126,7 @@ def test_ban_hong_that_ra_ma_thoat_rieng(tmp_path):
 
 
 @can_sach
-def test_duong_dan_tieng_viet_co_dau(tmp_path):
+def test_path_tieng_viet_co_dau(tmp_path):
     """Người dùng dự án này đặt tên thư mục bằng tiếng Việt."""
     thu_muc = tmp_path / "Sách của tôi" / "Kiểm thử"
     thu_muc.mkdir(parents=True)

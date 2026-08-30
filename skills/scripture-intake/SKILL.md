@@ -15,7 +15,7 @@ Form of address: call the disciple **child**, refer to yourself as **this master
 
 **Early block (path unusable):** the reason was stated plainly and the path was asked for again; **no letter was written**; the hall has no new record. The last two must be verified, not taken as obvious.
 
-**Pointer updated for a book that moved:** that same old record now carries the new `duong_dan`, every old appraisal metric is unchanged, there is no second record, there is no letter — read the file back to confirm.
+**Pointer updated for a book that moved:** that same old record now carries the new `path`, every old appraisal metric is unchanged, there is no second record, there is no letter — read the file back to confirm.
 
 **Engine not installed:** this was stated plainly and the exact install command was given, **no install command was run**, and work stopped there.
 
@@ -34,16 +34,16 @@ Every branch: if the read-back after writing disagrees, it is not done — fix i
 
 ## Load `customize.toml`
 
-A required step before the main work. Read `ngan_sach_token` from two layers:
+A required step before the main work. Read `token_budget` from two layers:
 
-1. Base layer: `thu-bi-kip/customize.toml` — defaults `nhe = 60000`, `nang = 150000`.
+1. Base layer: `scripture-intake/customize.toml` — defaults `light = 60000`, `heavy = 150000`.
 2. Personal layer: `~/.wayfarer/custom/scripture-intake.toml` (read it only if it exists), may be written sparsely.
 
-Merge field by field: whichever field the personal layer declares overrides that field; a field it does not declare keeps the base layer's value (only `nang = 100000` → merges to `nhe = 60000`, `nang = 100000`).
+Merge field by field: whichever field the personal layer declares overrides that field; a field it does not declare keeps the base layer's value (only `heavy = 100000` → merges to `light = 60000`, `heavy = 100000`).
 
-**Check `nhe < nang` after merging.** If it does not hold: say so plainly to the disciple and use the base layer's values for this turn — a silent inversion drops every book into the same band.
+**Check `light < heavy` after merging.** If it does not hold: say so plainly to the disciple and use the base layer's values for this turn — a silent inversion drops every book into the same band.
 
-This skill exposes only `ngan_sach_token`. If asked about `bi_kip_template` or `pha2_reviewers`, say straight out that those two fields are not exposed because the phase they serve is not built — do not invent values.
+This skill exposes only `token_budget`. If asked about `bi_kip_template` or `pha2_reviewers`, say straight out that those two fields are not exposed because the phase they serve is not built — do not invent values.
 
 ## Present, confirm, write, verify
 
@@ -55,8 +55,8 @@ This skill exposes only `ngan_sach_token`. If asked about `bi_kip_template` or `
 
 Read `~/.wayfarer/scripture-hall/drafts/` (treat it as empty if it does not exist yet) and compare against the path just normalised:
 
-- **`duong_dan` matches exactly** → this book is already in the hall. Go to **Branch E**, having run nothing.
-- **Only `filename` matches, `duong_dan` differs** → it may be the same book that has moved, or it may be **two different books sharing a file name**. **Do not conclude on your own.** Present the old record (old path, word count, date logged) and ask: the same book that merely changed place, or a different one? Same book → **Branch G**; different book → Step 2 as a new book.
+- **`path` matches exactly** → this book is already in the hall. Go to **Branch E**, having run nothing.
+- **Only `filename` matches, `path` differs** → it may be the same book that has moved, or it may be **two different books sharing a file name**. **Do not conclude on your own.** Present the old record (old path, word count, date logged) and ask: the same book that merely changed place, or a different one? Same book → **Branch G**; different book → Step 2 as a new book.
 - **Nothing matches** → Step 2.
 - **A record file cannot be read or parsed** → name which file is broken, skip it in the comparison, **do not fix or delete it yourself**.
 
@@ -65,7 +65,7 @@ Read `~/.wayfarer/scripture-hall/drafts/` (treat it as empty if it does not exis
 Do not call `book_to_skill` directly. Run:
 
 ```
-python <gốc-plugin>/bin/appraise.py "<đường-dẫn-tuyệt-đối>"
+python <plugin-root>/bin/appraise.py "<absolute-path>"
 ```
 
 The script runs three path checks before it calls the engine, and **returns metric keys only — the book's content never reaches its output**. Call the engine directly and the whole book sits in the return value, with nothing to keep it out of the context.
@@ -76,7 +76,7 @@ Output: one JSON object on stdout, always carrying `status`. **Branch on the exi
 |---|---|---|
 | 0 | `ok` | Step 3 — `metrics` has the full numbers |
 | 1 | `not_a_file` · `unsupported_extension` · `empty_file` | **Early block** (see below) |
-| 2 | `extraction_failed` | **Branch Đ** — this is the genuinely broken copy |
+| 2 | `extraction_failed` | **Branch D** — this is the genuinely broken copy |
 | 3 | `engine_not_installed` | See below |
 
 **Engine not installed (code 3):** say plainly that the engine is missing, and give the command `pip install -r requirements-dev.txt` to be run from the plugin's root directory — the very directory holding the `bin/appraise.py` just called. **Do not run the install command yourself**: installing packages onto the user's machine is something you must ask about. Stop.
@@ -95,11 +95,11 @@ Read `metrics` in the JSON the script returns.
 
    > "Are you planning to read this one front to back, or is it the kind you consult as you go — open it wherever you need it?"
 
-   Sequential reading → `chuoi`, lookup → `mang`, with source flag `nguoi_hoc_khai`. If they say **don't know / both**: ask once more a different way (*"are you using it to learn the craft from the ground up, or to look things up when you get stuck at work?"*); if it is still unclear, take `chuoi` with the flag `mac_dinh`, and say plainly that this is a provisional choice that can be changed later. Do not guess by counting chapters — from the metrics, a lookup book looks exactly like a sequential one.
+   Sequential reading → `chuoi`, lookup → `mang`, with source flag `learner_declared`. If they say **don't know / both**: ask once more a different way (*"are you using it to learn the craft from the ground up, or to look things up when you get stuck at work?"*); if it is still unclear, take `chuoi` with the flag `default`, and say plainly that this is a provisional choice that can be changed later. Do not guess by counting chapters — from the metrics, a lookup book looks exactly like a sequential one.
 
    If it comes out `mang`: say plainly that the roadmap built later will be organised around tasks and will need the disciple to name a few real situations — **this is asking for more input, not criticising the book.**
 
-4. **How many chapters, and the cost estimate.** Chapters: say *"this copy yields this many chapters"*, not *"this book has this many chapters"* — extracting from a different format gives a different number. Cost: compare `estimated_tokens` against the merged `ngan_sach_token` (below `nhe` → thin, above `nang` → heavy, in between → medium), and say plainly that the estimate is for **the processing phases that come after**, not for the extraction (extraction takes seconds, even for a 500-page book).
+4. **How many chapters, and the cost estimate.** Chapters: say *"this copy yields this many chapters"*, not *"this book has this many chapters"* — extracting from a different format gives a different number. Cost: compare `estimated_tokens` against the merged `token_budget` (below `light` → thin, above `heavy` → heavy, in between → medium), and say plainly that the estimate is for **the processing phases that come after**, not for the extraction (extraction takes seconds, even for a 500-page book).
 
 **A page count always travels with `pages_label`.** Each format counts a different unit — saying "23 pages" for an EPUB, which has no notion of a page, is telling the disciple something false.
 
@@ -117,7 +117,7 @@ If the write fails (no permission, the path cannot be created): state the error 
 
 If the write succeeds, read that file back, match each metric against what was just presented, then tell the disciple what was written and where.
 
-### Branch Đ — No text could be extracted
+### Branch D — No text could be extracted
 
 Enter here only when the script returns **exit code 2**.
 
@@ -125,7 +125,7 @@ Enter here only when the script returns **exit code 2**.
 2. Say plainly: no text could be extracted from **this copy** — the book itself may well be sound, it is this printing or scan that is unusable. Advise finding another copy.
 3. **Send a letter to the Sect Master**, following the template in `references/format.md`.
 
-   Ask the disciple two things before writing: whether this book is on the list the Sect Master has given counsel on (and if so, under which title), and what they call this book. If there is a counsel title → derive a kebab-case identifier from it. Found on their own, or cannot remember → **leave** `bi_kip_chi_diem` **empty**, and say plainly to the disciple that empty is the signal "there is no counsel to update". Do not guess: a letter carrying the wrong identifier makes the receiving side amend the wrong counsel, which is worse than an empty one. `ten_sach` is always written.
+   Ask the disciple two things before writing: whether this book is on the list the Sect Master has given counsel on (and if so, under which title), and what they call this book. If there is a counsel title → derive a kebab-case identifier from it. Found on their own, or cannot remember → **leave** `counseled_scripture` **empty**, and say plainly to the disciple that empty is the signal "there is no counsel to update". Do not guess: a letter carrying the wrong identifier makes the receiving side amend the wrong counsel, which is worse than an empty one. `book_title` is always written.
 
 4. Read back the letter file just written and confirm its content.
 5. State straight out what is missing: the step where the Sect Master reads the letter box and changes a counsel's status **is not built in this version**; the letter will sit there waiting.
@@ -139,6 +139,6 @@ Report plainly that the hall already holds it, along with when it was logged and
 
 Enter here when Step 1 matched on `filename` and the disciple confirmed it is indeed the same book.
 
-Update the `duong_dan` of **that very record** to the new path, keeping every appraisal metric and the old `logged_at` unchanged — the book has not changed, only where it sits. Read back and verify.
+Update the `path` of **that very record** to the new path, keeping every appraisal metric and the old `logged_at` unchanged — the book has not changed, only where it sits. Read back and verify.
 
 Do **not** re-run the script, do **not** create a second record, do **not** send a broken-copy letter — this is not a broken book.

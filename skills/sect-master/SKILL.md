@@ -7,9 +7,9 @@ description: The Sect Master gives counsel on specific books (technique + heart 
 
 ## Done when
 
-**New batch of counsel:** the full number of techniques + heart methods for the right branch (already knows what they want to train / does not yet know — see Step 1) and matching the `so_chi_diem` loaded from `customize.toml`, each counsel carrying all five fields (title, author, year/edition, kind, rationale), the confidence hedge spoken before the list is handed over, the disciple has confirmed, and `truong-mon/counsel.jsonl` holds that many new lines with status `pending` — verified by reading back the very file just written.
+**New batch of counsel:** the full number of techniques + heart methods for the right branch (already knows what they want to train / does not yet know — see Step 1) and matching the `counsel_count` loaded from `customize.toml`, each counsel carrying all five fields (title, author, year/edition, kind, rationale), the confidence hedge spoken before the list is handed over, the disciple has confirmed, and `sect-master/counsel.jsonl` holds that many new lines with status `pending` — verified by reading back the very file just written.
 
-**Not-found report:** a `not_found` line has been written into `truong-mon/counsel-broken.jsonl` for exactly the counsel reported, AND a replacement counsel has been given (written as `pending`) within the same reply — not "next time".
+**Not-found report:** a `not_found` line has been written into `sect-master/counsel-broken.jsonl` for exactly the counsel reported, AND a replacement counsel has been given (written as `pending`) within the same reply — not "next time".
 
 **Asking for counsel again (not a not-found report):** confirmation was asked for first; if the disciple agrees, every old `pending` counsel has been moved to `expired` AND the new batch has been written as `pending`; if the disciple does not agree, stop and write nothing at all — silently skipping the question does not count as done.
 
@@ -28,16 +28,16 @@ In any branch above, if reading back after writing diverges from what was just c
 
 ## Load `customize.toml`
 
-A mandatory step before the main work — do it the moment the skill is called, ahead of Step 1 below. Read `so_chi_diem` from two layers:
+A mandatory step before the main work — do it the moment the skill is called, ahead of Step 1 below. Read `counsel_count` from two layers:
 
-1. Base layer: `truong-mon/customize.toml` (shipped with this skill) — defaults `da_biet = { technique = 3, heart-method = 2 }`, `chua_biet = { technique = 1, heart-method = 1 }`.
+1. Base layer: `sect-master/customize.toml` (shipped with this skill) — defaults `decided = { technique = 3, heart-method = 2 }`, `undecided = { technique = 1, heart-method = 1 }`.
 2. Personal layer: `~/.wayfarer/custom/sect-master.toml` (read only if it exists) — may be written sparsely, holding only the fields meant to change.
 
-Merge per sub-field: for each branch (`da_biet`/`chua_biet`) and each sub-field (`technique`/`heart-method`), if the personal layer declares that exact field, use the personal layer's value (overriding the base value); any field the personal layer does not declare keeps the base value. Example: the personal layer holds only `da_biet.technique = 5`, so the merged result is `da_biet = { technique = 5, heart-method = 2 }` (`heart-method` still comes from the base), and `chua_biet` keeps both fields from the base.
+Merge per sub-field: for each branch (`decided`/`undecided`) and each sub-field (`technique`/`heart-method`), if the personal layer declares that exact field, use the personal layer's value (overriding the base value); any field the personal layer does not declare keeps the base value. Example: the personal layer holds only `decided.technique = 5`, so the merged result is `decided = { technique = 5, heart-method = 2 }` (`heart-method` still comes from the base), and `undecided` keeps both fields from the base.
 
 Use exactly this merged set of numbers for every step below — do not hard-code 3/2 or 1/1 into what you say if the personal layer has changed the numbers.
 
-This skill exposes exactly one field, `so_chi_diem`. If the disciple asks about `persistent_facts` or `catalog_them` (which also belong to `truong-mon` per the design document), say plainly that those two fields are not exposed in this version; do not invent values or behaviour for them.
+This skill exposes exactly one field, `counsel_count`. If the disciple asks about `persistent_facts` or `catalog_them` (which also belong to `sect-master` per the design document), say plainly that those two fields are not exposed in this version; do not invent values or behaviour for them.
 
 ## Present, confirm, write, verify
 
@@ -47,9 +47,9 @@ This skill exposes exactly one field, `so_chi_diem`. If the disciple asks about 
 
 Read `~/.wayfarer/sect-master/profile.json`. File missing, or either of the two fields `vai`/`mach` missing or empty: refuse to give counsel immediately, say why, send them to `/wayfarer:initiation` to finish taking a master first — stop here, do not run the steps below.
 
-Both `vai` + `mach` present: also read `mach_nguon` to know which branch applies at Branch C below:
-- `mach_nguon = tu_khai` → the **already knows what they want to train** branch.
-- `mach_nguon = suy_tu_vai` → the **does not yet know what they want to train** branch.
+Both `vai` + `mach` present: also read `meridian_source` to know which branch applies at Branch C below:
+- `meridian_source = self_declared` → the **already knows what they want to train** branch.
+- `meridian_source = inferred_from_role` → the **does not yet know what they want to train** branch.
 
 ### Step 2 — Check pending counsel, pick the right branch
 
@@ -79,7 +79,7 @@ Never delete or edit an old line in place — only append new lines. Asking abou
 
 ### Branch C — A new batch of counsel
 
-1. **Fix the numbers:** use the `so_chi_diem` merged under "Load `customize.toml`", picking the branch that matches the `mach_nguon` read in Step 1 — `da_biet` (default 3 techniques + 2 heart methods) or `chua_biet` (default 1 technique + 1 heart method).
+1. **Fix the numbers:** use the `counsel_count` merged under "Load `customize.toml`", picking the branch that matches the `meridian_source` read in Step 1 — `decided` (default 3 techniques + 2 heart methods) or `undecided` (default 1 technique + 1 heart method).
 
 2. **Say the hedge BEFORE handing over the list**, not after. The hedge must state the true state of the hall in this version — the Scripture Hall currently **holds nothing** — rather than a vague lament along the lines of "I have no data". An example with the right spirit:
 
@@ -96,7 +96,7 @@ Never delete or edit an old line in place — only append new lines. Asking abou
 
    The first three fields (title, author, year/edition) must not be missing — giving all three makes the counsel more concrete than a bare title. If unsure about any fact (the exact publication year, say), state "not sure, it may be..." rather than giving a specific number as though it were certain.
 
-   **Before settling the list, read `truong-mon/counsel-broken.jsonl` (if present) and drop from the list every book the disciple has reported as not found** — never propose again a title already in there. Without this step, every request for counsel hands the disciple back the very book they already hunted for in vain. Also skip items currently `pending` (they are still in force and need no re-issue). If the disciple asks directly about a title in the broken list, it can still be given — see "Looking up an old title".
+   **Before settling the list, read `sect-master/counsel-broken.jsonl` (if present) and drop from the list every book the disciple has reported as not found** — never propose again a title already in there. Without this step, every request for counsel hands the disciple back the very book they already hunted for in vain. Also skip items currently `pending` (they are still in force and need no re-issue). If the disciple asks directly about a title in the broken list, it can still be given — see "Looking up an old title".
 
    **Each technique, when presented, comes with the name of one related supporting heart method** (one of the M heart methods above, or a short line on why that heart method suits this technique) — so the disciple knows it exists. Nothing that pushes the disciple to study the heart method first or immediately; heart methods are studied in parallel, not as a prerequisite.
 
@@ -108,7 +108,7 @@ Never delete or edit an old line in place — only append new lines. Asking abou
 
 6. **Confirm:** ask for agreement to write, and wait for the disciple's answer. If they want further changes, go back to step 3/4 for exactly the part they want changed.
 
-7. **Write:** append N+M new lines to `truong-mon/counsel.jsonl` (create the file/directory if absent), one line per counsel, `status = "pending"`, `confidence = "inference"`, a new `id` for each item (see File format). Append only — do not edit or delete any existing line.
+7. **Write:** append N+M new lines to `sect-master/counsel.jsonl` (create the file/directory if absent), one line per counsel, `status = "pending"`, `confidence = "inference"`, a new `id` for each item (see File format). Append only — do not edit or delete any existing line.
 
 8. **Verify:** read the file back and confirm the N+M new lines just written match what was confirmed at step 6.
 
@@ -120,28 +120,28 @@ If the disciple asks directly about an old counsel (already `expired` or `not_fo
 
 ## File format
 
-`truong-mon/counsel.jsonl` and `truong-mon/counsel-broken.jsonl` are append-only logs (one JSON line per event, no editing an old line in place). The current state of a counsel is always the `status` on the newest line carrying that exact `id`.
+`sect-master/counsel.jsonl` and `sect-master/counsel-broken.jsonl` are append-only logs (one JSON line per event, no editing an old line in place). The current state of a counsel is always the `status` on the newest line carrying that exact `id`.
 
 Each line of `counsel.jsonl`:
 
 ```json
-{"id": "kiem-thu-linh-hoat", "title": "Lessons Learned in Software Testing", "author": "Cem Kaner, James Bach, Bret Pettichord", "published_year": "2001", "kind": "technique", "rationale": "...", "confidence": "inference", "status": "pending", "logged_at": "2026-08-27T10:00:00+07:00"}
+{"id": "kiem-tome-spirit-hoat", "title": "Lessons Learned in Software Testing", "author": "Cem Kaner, James Bach, Bret Pettichord", "published_year": "2001", "kind": "technique", "rationale": "...", "confidence": "inference", "status": "pending", "logged_at": "2026-08-27T10:00:00+07:00"}
 ```
 
 Valid values for `kind`: `technique`, `heart-method`.
 
-Valid values for `confidence`: `so_lieu_that`, `nguon_khai_bao`, `inference` — three levels belonging to the system's overall design; in its current version this skill only has a road to `inference`, and the other two values are declared in full in the format so the file's shape need not change when the hall-reading part gains real data later on.
+Valid values for `confidence`: `measured`, `declared`, `inference` — three levels belonging to the system's overall design; in its current version this skill only has a road to `inference`, and the other two values are declared in full in the format so the file's shape need not change when the hall-reading part gains real data later on.
 
-Valid values for `status`: `pending`, `expired`, `da_thu`, `ban_hong`, `not_found`. This skill only ever writes `pending`, `expired`, and `not_found`. The two values `da_thu` (taken into the Scripture Hall) and `ban_hong` (right book, unreadable copy) are declared in full in the format so the file's shape need not change, but no step in this skill produces them — they arrive only from somewhere else, not built in this version. On meeting a line with either of these states (when looking up an old title, say), display it exactly as read, without inferring anything further.
+Valid values for `status`: `pending`, `expired`, `collected`, `damaged_copy`, `not_found`. This skill only ever writes `pending`, `expired`, and `not_found`. The two values `collected` (taken into the Scripture Hall) and `damaged_copy` (right book, unreadable copy) are declared in full in the format so the file's shape need not change, but no step in this skill produces them — they arrive only from somewhere else, not built in this version. On meeting a line with either of these states (when looking up an old title, say), display it exactly as read, without inferring anything further.
 
 Each line of `counsel-broken.jsonl` (written only when `status` is `not_found`):
 
 ```json
-{"id": "kiem-thu-linh-hoat", "title": "Lessons Learned in Software Testing", "author": "Cem Kaner, James Bach, Bret Pettichord", "published_year": "2001", "kind": "technique", "status": "not_found", "logged_at": "2026-08-27T10:15:00+07:00"}
+{"id": "kiem-tome-spirit-hoat", "title": "Lessons Learned in Software Testing", "author": "Cem Kaner, James Bach, Bret Pettichord", "published_year": "2001", "kind": "technique", "status": "not_found", "logged_at": "2026-08-27T10:15:00+07:00"}
 ```
 
 `id`: a kebab-case string shortened from the title (diacritics dropped, spaces to hyphens, lowercase). If it collides with an `id` already in `counsel.jsonl` (including one for a different book with a near-identical title), add an ordinal suffix (`-2`, `-3`...) to tell them apart. Use one `id` throughout the whole life of a counsel — every later event line about that same counsel (moving to `expired`, `not_found`...) reuses this exact `id`, never a new one for the same counsel.
 
 `logged_at`: the moment of writing, ISO 8601 with a timezone offset (for example `2026-08-27T10:00:00+07:00`) or `Z` for UTC.
 
-No role or skill other than `truong-mon` reads or writes these two files directly.
+No role or skill other than `sect-master` reads or writes these two files directly.

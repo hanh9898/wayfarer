@@ -12,17 +12,17 @@ SCRIPT = REPO / "bin" / "validate-scripture.py"
 FIX = REPO / "tests" / "fixtures"
 
 
-def chay(duong_dan, json=False):
-    cmd = [sys.executable, str(SCRIPT), str(duong_dan)]
+def chay(path, json=False):
+    cmd = [sys.executable, str(SCRIPT), str(path)]
     if json:
         cmd.append("--json")
     r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
     return r.returncode, r.stdout
 
 
-def ma_loi(duong_dan):
+def ma_loi(path):
     import json as J
-    _, out = chay(duong_dan, json=True)
+    _, out = chay(path, json=True)
     kq = J.loads(out)["result"][0]
     return {l["code"] for l in kq["errors"]}, {c["code"] for c in kq["warnings"]}
 
