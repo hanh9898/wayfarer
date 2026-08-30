@@ -1,0 +1,16 @@
+schema: 1
+chapter: 1
+objective: "Chia được input thành phân vùng tương đương cho một form thật"
+baseline_assumption: ["biết một test case gồm những gì"]
+worked_example: {points_to: "chương 1, mục 1.2"}
+common_mistakes:
+  - signal: "chia phân vùng theo trường trên màn hình"
+    misconception: "tưởng mỗi ô nhập là một phân vùng"
+    remedy: "đưa một ô có 3 miền giá trị hợp lệ khác nhau"
+    origin: person
+pass_criteria:
+  - {id: tc1, description: "nêu được ≥1 phân vùng mà ranh giới không trùng ranh giới trường nhập"}
+question_templates:
+  - {id: q0, kind: recall, bloom: remember, covers_criteria: [tc1], template: "Phân vùng tương đương là gì?"}
+  - {id: q1, kind: apply, bloom: apply, covers_criteria: [tc1], template: "Trong {tinh_huong}, trường nào có nhiều hơn một miền hợp lệ?"}
+drill: "Chia phân vùng cho một form ngươi đang làm."
