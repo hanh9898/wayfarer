@@ -1,0 +1,20 @@
+# Bề mặt tuỳ biến của skill thu-bi-kip — lớp gốc, theo plugin, ghi đè mỗi lần cập nhật.
+#
+# Lớp cá nhân (sửa được): ~/.wayfarer/custom/scripture-intake.toml — ghi THƯA, chỉ trường muốn đổi.
+# Ví dụ một file cá nhân hợp lệ, chép được nguyên xi:
+#
+#     [ngan_sach_token]
+#     nang = 100000
+#
+# Gộp ra: nhe = 60000 (giữ của lớp gốc), nang = 100000 (lớp cá nhân đè).
+#
+# Chỉ ngan_sach_token được phơi ra ở bản này. Hai trường bi_kip_template và pha2_reviewers
+# thuộc thu-bi-kip theo tài liệu thiết kế chung, nhưng cả hai chỉ có nghĩa ở pha thiết kế
+# sư phạm — pha đó chưa dựng, nên không có bước đọc nào dùng tới. Cố ý để trống, không bịa.
+
+[ngan_sach_token]
+# Mốc so sánh khi ước chi phí ở phép giám định thứ tư. Đơn vị: token của toàn bộ chữ rút
+# ra được, KHÔNG phải chi phí rút chữ — rút chữ chỉ vài giây kể cả sách 500 trang.
+# Phải giữ nhe < nang; skill kiểm điều này sau khi gộp và cảnh báo nếu bị đảo.
+nhe = 60000    # dưới mức này: sách mỏng, pha sau chạy thoải mái
+nang = 150000  # trên mức này: sách nặng, nói trước để người học biết pha sau tốn nhiều lượt

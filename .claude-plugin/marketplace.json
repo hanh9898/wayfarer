@@ -1,10 +1,10 @@
 {
-  "name": "van-dao",
+  "name": "wayfarer",
   "description": "Hệ thống học kỹ năng từ sách bạn đã có, dựng trên thế giới quan tu luyện.",
   "owner": { "name": "hanhnt2", "email": "hanhnt2@hblab.vn" },
   "plugins": [
     {
-      "name": "van-dao",
+      "name": "wayfarer",
       "source": "./",
       "description": "Thu bí kíp từ PDF/EPUB thành lộ trình học; dẫn học từng chương; khảo thí để đột phá cảnh giới."
     }

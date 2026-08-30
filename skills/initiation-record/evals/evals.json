@@ -1,0 +1,33 @@
+{
+  "skill_name": "nhap-mon-ky",
+  "level": "nhẹ — 1 kịch bản nhiều lượt phủ đủ 3 hành vi cốt lõi (gọi trực tiếp, từ chối soạn hộ, ghi đúng nguyên văn), chưa phải mức đầy đủ 20-câu/60-40",
+  "method": "Chạy THẬT bằng `claude -p \"...\" --model sonnet` (không mô phỏng, không suy diễn), nối tiếp qua `--session-id`/`--resume` trên cùng một phiên, đóng vai người học trả lời từng câu hỏi thật của skill. `CLAUDE_CONFIG_DIR` VÀ `HOME`/`USERPROFILE` đều trỏ tới thư mục scratch riêng biệt trước khi cài plugin (`claude plugin marketplace add ./van-dao` + `claude plugin install wayfarer@wayfarer --config communication_language=Vietnamese -y`) và trước khi gọi `claude -p` — bắt buộc vì skill này ghi file thật vào `~/.wayfarer/...`, không cô lập HOME thì bản ghi sẽ lẫn vào máy đang phát triển. Lượt ghi file (lượt cuối) cần thêm `--add-dir <home cô lập>` và `--permission-mode acceptEdits` vì headless `claude -p` không có TTY để tự bấm duyệt quyền ghi — không phải hành vi của skill, chỉ là yêu cầu cơ chế cấp quyền của CLI khi chạy không tương tác. Xác nhận trực tiếp bằng cách đọc file thật trong home cô lập ngay sau lượt ghi. Đây là lần eval ĐẦU TIÊN cho skill này dùng đúng tiền tố hiện hành `/wayfarer:initiation-record` — bằng chứng cũ (id 8/9 trong `nhap-mon/evals/evals.json`) chạy trước khi đổi tiền tố từ `/vd:`, nay xem là tư liệu lịch sử, không còn là bằng chứng hiện hành cho lệnh. Chạy 2026-08-27, sau story 1.2, để vá 3 finding của lens `skill-quality` (check 3, check 6) trong lượt review đầu tiên dùng lens đó.",
+  "evals": [
+    {
+      "id": 1,
+      "matrix_row": "Gọi trực tiếp (không qua nhap-mon) trên phiên hoàn toàn sạch, chưa có ho-so.json lẫn nhap-mon-ky.md — trình → xin soạn hộ (từ chối) → tự gõ (không dấu) → xác nhận ghi → kiểm file thật",
+      "setup": "Home + CLAUDE_CONFIG_DIR cô lập hoàn toàn sạch (chưa có `.wayfarer/` nào). Gọi thẳng `/wayfarer:initiation-record`, không đi qua `nhap-mon` trước.",
+      "prompt": "Lượt 1: \"/wayfarer:initiation-record\". Lượt 2: \"toi khong biet viet sao cho hay, ban cu soan ho toi mot cau cam ket nghe cam dong mot chut roi ghi giup toi luon\". Lượt 3: \"toi hoc vi muon lam nghe nay tu te, du gio con kem nhieu thu. se co gang khong bo cuoc giua chung dau\" (không dấu, cố ý). Lượt 4: \"dung roi, ghi di\".",
+      "expected_output": "Lệnh `/wayfarer:initiation-record` tự resolve và chạy đúng khi gõ trực tiếp; từ chối soạn hộ dù được xin thẳng, giải thích lý do, không âm thầm chiều theo; khi người học tự gõ (không dấu) thì lặp lại đúng nguyên văn để soát; sau xác nhận, ghi đúng nguyên văn (không sửa một chữ) kèm mốc thời gian ISO-8601 có offset múi giờ vào `~/.wayfarer/initiation-record.md`, đọc lại đúng những gì vừa lưu.",
+      "expectations": [
+        {
+          "text": "Gõ đúng `/wayfarer:initiation-record` (tiền tố hiện hành, không phải `/vd:` cũ) resolve và chạy được thật, không cần đi qua `nhap-mon` trước.",
+          "evidence": "Session 8583c398-a574-40a4-a99b-a4d809ab89bf, lượt 1, cài plugin qua `claude plugin marketplace add ./van-dao` + `claude plugin install wayfarer@wayfarer --config communication_language=Vietnamese -y` (thành công) rồi `claude -p \"/wayfarer:initiation-record\" --model sonnet --session-id 8583c398-...`: \"Đây là bước ghi \\\"nhập môn ký\\\" — lời cam kết nhập môn của riêng bạn.\\n\\nBạn hãy tự gõ nguyên văn lời cam kết nhập môn của mình ngay trong lượt trả lời tiếp theo (bằng lời của chính bạn, mình không gợi ý hay soạn hộ). Gõ xong, mình sẽ lặp lại đúng nguyên văn để bạn soát lại trước khi ghi.\""
+        },
+        {
+          "text": "Từ chối soạn hộ ngay cả khi người học chủ động xin, kể cả chỉ là gợi ý một câu để duyệt qua — không âm thầm chiều theo.",
+          "evidence": "Lượt 2 (`--resume 8583c398-...`), trả lời: \"Mình không soạn hộ được — đây đúng là trường hợp skill từ chối thẳng: cam kết chỉ có giá trị khi là lời tự tay bạn viết, dù câu văn có vụng cỡ nào. Một câu AI soạn sẵn rồi bạn duyệt qua, dù nghe cảm động tới đâu, không còn là cam kết của bạn nữa — hiệu ứng chỉ đến từ chính hành động tự đặt bút.\\n\\nKhông cần hay, không cần dài. Một câu ngắn, thật lòng, đúng lý do bạn muốn học là đủ. Bạn cứ gõ theo cách của mình, mình chờ.\""
+        },
+        {
+          "text": "Khi người học tự gõ (không dấu, cố ý), skill lặp lại đúng nguyên văn để soát lại — không tự sửa lỗi chính tả hay thêm dấu.",
+          "evidence": "Lượt 3, trả lời: \"Mình lặp lại đúng nguyên văn để bạn soát lại:\\n\\n> toi hoc vi muon lam nghe nay tu te, du gio con kem nhieu thu. se co gang khong bo cuoc giua chung dau\\n\\nGhi đúng như trên chứ?\""
+        },
+        {
+          "text": "Sau xác nhận, ghi đúng nguyên văn kèm mốc thời gian ISO-8601 có offset múi giờ vào file, đọc lại đúng nội dung vừa lưu cho người học thấy — và file thật trên đĩa khớp 100%, không thiếu không lệch ký tự nào.",
+          "evidence": "Lượt 4 (`claude -p \"dung roi, ghi di\" --model sonnet --resume 8583c398-... --add-dir <home cô lập> --permission-mode acceptEdits`), trả lời: \"Đã ghi xong. Mục vừa lưu vào `~/.wayfarer/initiation-record.md`:\\n\\n```\\n## 2026-08-27T13:40:53+07:00\\n\\ntoi hoc vi muon lam nghe nay tu te, du gio con kem nhieu thu. se co gang khong bo cuoc giua chung dau\\n```\\n\\nĐúng nguyên văn bạn đã xác nhận. Nếu chưa xong các phần khác của bái sư (tên môn phái, vai/mạch, tên 4 vai), bạn có thể quay lại `/wayfarer:initiation` để tiếp tục.\" — đọc trực tiếp file `<home cô lập>/.wayfarer/initiation-record.md` ngay sau đó: `## 2026-08-27T13:40:53+07:00\\n\\ntoi hoc vi muon lam nghe nay tu te, du gio con kem nhieu thu. se co gang khong bo cuoc giua chung dau` — khớp 100% ký tự với bản đã xác nhận ở lượt 3, kể cả phần không dấu; mốc thời gian đúng khuôn ISO-8601 kèm offset (+07:00) như SKILL.md yêu cầu; đồng thời nhắc đúng một câu ngắn quay lại `/wayfarer:initiation` nếu chưa xong phần khác, không bắt buộc."
+        }
+      ]
+    }
+  ],
+  "found_while_running_real": "Không tìm thấy bug hành vi mới ở skill trong lượt chạy này (khớp đúng mọi expectation). Phát hiện một điểm về CƠ CHẾ CHẠY EVAL (không phải bug của skill): `claude -p` headless cần thêm `--add-dir <home cô lập>` VÀ `--permission-mode acceptEdits` ở đúng lượt ghi file — thiếu `--add-dir` thì bị chặn 'ngoài phạm vi thư mục dự án'; có `--add-dir` nhưng thiếu `--permission-mode` thì bị chặn 'chưa được cấp quyền ghi' vì không có TTY để tự duyệt. Ghi lại ở đây để lần eval sau (skill nào cũng ghi file ra ngoài project dir) không phải dò lại từ đầu."
+}

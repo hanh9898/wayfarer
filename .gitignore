@@ -1,7 +1,7 @@
 # Sách và hồ sơ người học — KHÔNG BAO GIỜ vào repo
 *.pdf
 *.epub
-.vandao/
+.wayfarer/
 
 # BMAD dùng làm công cụ phát triển, không phát hành kèm
 _bmad/

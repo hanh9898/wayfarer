@@ -21,7 +21,7 @@ Thế giới quan không phải lớp sơn — nó **đổi cách hệ hành x�
 ```
 van-dao/
   .claude-plugin/     plugin.json · marketplace.json
-  tham-chieu/         data contract
+  reference/         data contract
   bin/                script tất định
   tests/              pytest + fixture
   skills/ agents/ hooks/    chưa có gì
@@ -33,7 +33,7 @@ van-dao/
 
 ```bash
 pip install pyyaml
-python bin/kiem-bi-kip.py --kho tests/fixtures
+python bin/validate-scripture.py --kho tests/fixtures
 ```
 
 ## Đọc theo thứ tự nào
@@ -42,7 +42,7 @@ python bin/kiem-bi-kip.py --kho tests/fixtures
 |---|---|
 | Đang ở đâu, làm gì tiếp | `../docs/VAN-DAO-trang-thai-du-an.md` |
 | Hệ thiết kế thế nào và vì sao | `../docs/VAN-DAO-dac-ta-v1.0.md` — bắt đầu ở §0 bảng tra |
-| Quy cách một bí kíp | `tham-chieu/bi-kip.schema.md` |
+| Quy cách một bí kíp | `reference/scripture.schema.md` |
 | Dựng môi trường | `../docs/VAN-DAO-setup-du-an.md` |
 
 ## Giấy phép
