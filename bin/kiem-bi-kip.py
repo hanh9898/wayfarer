@@ -48,18 +48,18 @@ except ImportError:
 
 SCHEMA = 1
 
-CANH_GIOI = ["qi-refining", "foundation", "core-formation", "nascent-soul", "soul-transformation"]
-DO_PHUC_TAP = ["low", "medium", "high"]
-GIAN_GIAO = ["heavy", "medium", "light"]
-LOAI_CAU_HOI = ["recall", "apply", "analyze"]
+REALMS = ["qi-refining", "foundation", "core-formation", "nascent-soul", "soul-transformation"]
+COMPLEXITY = ["low", "medium", "high"]
+SCAFFOLD = ["heavy", "medium", "light"]
+QUESTION_KINDS = ["recall", "apply", "analyze"]
 BLOOM = ["remember", "understand", "apply", "analyze", "evaluate", "create"]
-BLOOM_TINH_BANG_CHUNG = ["apply", "analyze", "evaluate", "create"]
-ORIGIN_MISTAKE = ["person", "book", "inference"]
+BLOOM_COUNTS_AS_EVIDENCE = ["apply", "analyze", "evaluate", "create"]
+MISTAKE_ORIGINS = ["person", "book", "inference"]
 
-TRUONG_QUYEN = ["schema", "id", "kind", "structure", "source", "source_file",
+VOLUME_FIELDS = ["schema", "id", "kind", "structure", "source", "source_file",
                 "realm_required", "realm_granted", "meridians", "volume_ordeal"]
-TRUONG_BI_KIP = ["spine", "branches", "depends_on", "task_class", "descend_after"]
-TRUONG_SU_PHAM = ["objective", "baseline_assumption", "worked_example",
+SCRIPTURE_FIELDS = ["spine", "branches", "depends_on", "task_class", "descend_after"]
+PEDAGOGY_FIELDS = ["objective", "baseline_assumption", "worked_example",
                   "common_mistakes", "pass_criteria", "question_templates"]
 
 
@@ -91,7 +91,7 @@ class KetQua:
 
 # ---------------------------------------------------------------- đọc file
 
-def doc_yaml(path, kq):
+def read_yaml(path, kq):
     try:
         with open(path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
@@ -107,7 +107,7 @@ def doc_yaml(path, kq):
     return data
 
 
-def van_tay(path):
+def fingerprint(path):
     h = hashlib.sha256()
     with open(path, "rb") as f:
         for khoi in iter(lambda: f.read(1 << 20), b""):
@@ -118,27 +118,27 @@ def van_tay(path):
 # ------------------------------------------------------- kiểm cấp quyển
 
 # Trường bắt buộc CÓ MẶT, nhưng được phép rỗng.
-CHO_PHEP_RONG = {"branches", "baseline_assumption", "common_mistakes", "roles",
+MAY_BE_EMPTY = {"branches", "baseline_assumption", "common_mistakes", "roles",
                  "redundant", "depends_on", "descend_after"}
 
 
-def kiem_truong_bat_buoc(d, truong, kq, o):
+def check_required_fields(d, truong, kq, o):
     """Vắng khoá là lỗi. Rỗng chỉ là lỗi khi trường đó không được phép rỗng."""
     for t in truong:
         if t not in d or d[t] is None:
             kq.L("thieu-truong", f"thiếu trường bắt buộc `{t}`", o)
-        elif d[t] in ("", [], {}) and t not in CHO_PHEP_RONG:
+        elif d[t] in ("", [], {}) and t not in MAY_BE_EMPTY:
             kq.L("truong-rong", f"trường `{t}` không được rỗng", o)
 
 
-def kiem_enum(gia_tri, hop_le, ten, kq, o):
+def check_enum(gia_tri, hop_le, ten, kq, o):
     if gia_tri is not None and gia_tri not in hop_le:
         kq.L("enum-sai", f"`{ten}` = {gia_tri!r}, phải thuộc {hop_le}", o)
 
 
-def kiem_manifest(m, thu_muc, kq):
+def check_manifest(m, thu_muc, kq):
     o = "manifest.yaml"
-    kiem_truong_bat_buoc(m, TRUONG_QUYEN, kq, o)
+    check_required_fields(m, VOLUME_FIELDS, kq, o)
 
     if m.get("schema") != SCHEMA:
         kq.L("schema-khong-khop",
@@ -146,14 +146,14 @@ def kiem_manifest(m, thu_muc, kq):
              "Nâng cấp có ý thức, đừng để script đoán.", o)
         return
 
-    kiem_enum(m.get("kind"), ["scripture", "fragment"], "kind", kq, o)
-    kiem_enum(m.get("structure"), ["chain", "web"], "structure", kq, o)
-    kiem_enum(m.get("realm_required"), CANH_GIOI, "realm_required", kq, o)
-    kiem_enum(m.get("realm_granted"), CANH_GIOI, "realm_granted", kq, o)
+    check_enum(m.get("kind"), ["scripture", "fragment"], "kind", kq, o)
+    check_enum(m.get("structure"), ["chain", "web"], "structure", kq, o)
+    check_enum(m.get("realm_required"), REALMS, "realm_required", kq, o)
+    check_enum(m.get("realm_granted"), REALMS, "realm_granted", kq, o)
 
     vao, ra = m.get("realm_required"), m.get("realm_granted")
-    if vao in CANH_GIOI and ra in CANH_GIOI:
-        if CANH_GIOI.index(ra) < CANH_GIOI.index(vao):
+    if vao in REALMS and ra in REALMS:
+        if REALMS.index(ra) < REALMS.index(vao):
             kq.L("canh-gioi-lui",
                  f"realm_granted ({ra}) thấp hơn realm_required ({vao})", o)
 
@@ -173,7 +173,7 @@ def kiem_manifest(m, thu_muc, kq):
         if not p.exists():
             kq.C("gay-con-tro", f"không thấy file nguồn: {dp}. Chạy /vd:noi-lai", o)
         elif nf.get("fingerprint"):
-            thuc = van_tay(p)
+            thuc = fingerprint(p)
             if thuc != nf["fingerprint"]:
                 kq.C("gay-con-tro",
                      f"vân tay không khớp — file nguồn đã đổi. Chạy /vd:noi-lai", o)
@@ -184,9 +184,9 @@ def kiem_manifest(m, thu_muc, kq):
 
 # ------------------------------------------------------- kiểm sư phạm
 
-def kiem_khoi_su_pham(d, kq, o):
+def check_pedagogy_block(d, kq, o):
     """Dùng cho cả chương (bí kíp) lẫn cấp gốc (tàn quyển)."""
-    kiem_truong_bat_buoc(d, TRUONG_SU_PHAM, kq, o)
+    check_required_fields(d, PEDAGOGY_FIELDS, kq, o)
 
     tieu_chi = d.get("pass_criteria") or []
     cau_hoi = d.get("question_templates") or []
@@ -209,10 +209,10 @@ def kiem_khoi_su_pham(d, kq, o):
             kq.L("id-trung", f"`question_templates.id` trùng: {q['id']}", o)
         ids_q.append(q["id"])
 
-        kiem_enum(q.get("kind"), LOAI_CAU_HOI, f"{q['id']}.loai", kq, o)
-        kiem_enum(q.get("bloom"), BLOOM, f"{q['id']}.bloom", kq, o)
+        check_enum(q.get("kind"), QUESTION_KINDS, f"{q['id']}.loai", kq, o)
+        check_enum(q.get("bloom"), BLOOM, f"{q['id']}.bloom", kq, o)
 
-        if q.get("bloom") in BLOOM_TINH_BANG_CHUNG:
+        if q.get("bloom") in BLOOM_COUNTS_AS_EVIDENCE:
             co_ap_dung = True
 
         tro = q.get("covers_criteria") or []
@@ -255,7 +255,7 @@ def kiem_khoi_su_pham(d, kq, o):
             for t in ("signal", "misconception", "remedy", "origin"):
                 if not sl.get(t):
                     kq.L("sai-lam-thieu-truong", f"mục {i} thiếu `{t}`", o)
-            kiem_enum(sl.get("origin"), ORIGIN_MISTAKE, f"common_mistakes[{i}].origin", kq, o)
+            check_enum(sl.get("origin"), MISTAKE_ORIGINS, f"common_mistakes[{i}].origin", kq, o)
             if sl.get("source") == "inference":
                 kq.G("sai-lam-suy-doan",
                      f"mục {i} nguồn `suy_doan` — phải hiện cờ khi dùng", o)
@@ -263,7 +263,7 @@ def kiem_khoi_su_pham(d, kq, o):
 
 # ------------------------------------------------------- kiểm đồ thị
 
-def kiem_do_thi(m, so_chuong, kq):
+def check_graph(m, so_chuong, kq):
     o = "manifest.yaml"
     xs = m.get("spine") or []
     cn = m.get("branches") or []
@@ -338,10 +338,10 @@ def kiem_do_thi(m, so_chuong, kq):
         if not isinstance(lop, dict):
             kq.L("lop-nhiem-vu-sai", f"lớp {i} không phải ánh xạ", o)
             continue
-        kiem_enum(lop.get("complexity"), DO_PHUC_TAP, f"task_class[{i}].complexity", kq, o)
-        kiem_enum(lop.get("scaffold"), GIAN_GIAO, f"task_class[{i}].scaffold", kq, o)
-        if lop.get("complexity") in DO_PHUC_TAP:
-            muc = DO_PHUC_TAP.index(lop["complexity"])
+        check_enum(lop.get("complexity"), COMPLEXITY, f"task_class[{i}].complexity", kq, o)
+        check_enum(lop.get("scaffold"), SCAFFOLD, f"task_class[{i}].scaffold", kq, o)
+        if lop.get("complexity") in COMPLEXITY:
+            muc = COMPLEXITY.index(lop["complexity"])
             if muc < truoc:
                 kq.L("do-phuc-tap-giam-nguoc",
                      f"lớp {i} có độ phức tạp thấp hơn lớp trước — "
@@ -374,7 +374,7 @@ def kiem_do_thi(m, so_chuong, kq):
 
 # ------------------------------------------------------- kiểm khảo thí
 
-def kiem_khao_thi(m, kq):
+def check_ordeal(m, kq):
     o = "manifest.yaml → volume_ordeal"
     kt = m.get("volume_ordeal") or {}
     if not isinstance(kt, dict):
@@ -416,13 +416,13 @@ def kiem_khao_thi(m, kq):
 
 # ------------------------------------------------------- một bí kíp
 
-def kiem_mot(thu_muc: Path) -> KetQua:
+def check_one(thu_muc: Path) -> KetQua:
     kq = KetQua(thu_muc.name)
-    m = doc_yaml(thu_muc / "manifest.yaml", kq)
+    m = read_yaml(thu_muc / "manifest.yaml", kq)
     if m is None:
         return kq
 
-    kiem_manifest(m, thu_muc, kq)
+    check_manifest(m, thu_muc, kq)
     if any(l["ma"] == "schema-khong-khop" for l in kq.loi):
         return kq
 
@@ -430,18 +430,18 @@ def kiem_mot(thu_muc: Path) -> KetQua:
     thu_muc_chuong = thu_muc / "chapters"
 
     if loai == "fragment":
-        for t in TRUONG_BI_KIP:
+        for t in SCRIPTURE_FIELDS:
             if t in m:
                 kq.L("tan-quyen-thua-truong",
                      f"tàn quyển không được có `{t}`", "manifest.yaml")
         if thu_muc_chuong.exists():
             kq.L("tan-quyen-co-chuong",
                  "tàn quyển không được có thư mục `chapters/`", "manifest.yaml")
-        kiem_khoi_su_pham(m, kq, "manifest.yaml (tàn quyển)")
+        check_pedagogy_block(m, kq, "manifest.yaml (tàn quyển)")
 
     elif loai == "scripture":
-        kiem_truong_bat_buoc(m, TRUONG_BI_KIP, kq, "manifest.yaml")
-        for t in TRUONG_SU_PHAM:
+        check_required_fields(m, SCRIPTURE_FIELDS, kq, "manifest.yaml")
+        for t in PEDAGOGY_FIELDS:
             if t in m:
                 kq.L("bi-kip-thua-truong",
                      f"bí kíp không đặt `{t}` ở cấp quyển — nó thuộc từng chương",
@@ -452,7 +452,7 @@ def kiem_mot(thu_muc: Path) -> KetQua:
 
         so_chuong = set()
         for f in sorted(thu_muc_chuong.glob("*.yaml")):
-            d = doc_yaml(f, kq)
+            d = read_yaml(f, kq)
             if d is None:
                 continue
             o = f"chapters/{f.name}"
@@ -466,30 +466,30 @@ def kiem_mot(thu_muc: Path) -> KetQua:
             if so in so_chuong:
                 kq.L("chuong-trung", f"số chương trùng: {so}", o)
             so_chuong.add(so)
-            kiem_khoi_su_pham(d, kq, o)
+            check_pedagogy_block(d, kq, o)
 
         if not so_chuong:
             kq.L("khong-co-chuong", "không có file chương nào đọc được")
         else:
-            kiem_do_thi(m, so_chuong, kq)
+            check_graph(m, so_chuong, kq)
 
-    kiem_khao_thi(m, kq)
+    check_ordeal(m, kq)
     return kq
 
 
 # ------------------------------------------------------- in kết quả
 
-BIEU = {"loi": "LỖI", "canh_bao": "CẢNH BÁO", "ghi_chu": "ghi chú"}
+LABELS = {"loi": "LỖI", "canh_bao": "CẢNH BÁO", "ghi_chu": "ghi chú"}
 
 
-def in_text(kqs):
+def print_report(kqs):
     for kq in kqs:
         trang_thai = "ĐẠT" if kq.dat() else "KHÔNG ĐẠT"
         print(f"\n=== {kq.ten} — {trang_thai} ===")
         for muc in ("loi", "canh_bao", "ghi_chu"):
             for m in getattr(kq, muc):
                 o = f" [{m['o']}]" if m.get("o") else ""
-                print(f"  {BIEU[muc]:<9}{m['thong_diep']}{o}")
+                print(f"  {LABELS[muc]:<9}{m['thong_diep']}{o}")
         if kq.dat() and not kq.canh_bao and not kq.ghi_chu:
             print("  không có gì để nói")
 
@@ -525,14 +525,14 @@ def main():
             sys.stderr.write(f"kho rỗng: {kho}\n")
             sys.exit(2)
 
-    kqs = [kiem_mot(p) for p in muc]
+    kqs = [check_one(p) for p in muc]
 
     if a.json:
         print(json.dumps({"schema": SCHEMA,
                           "ket_qua": [k.as_dict() for k in kqs]},
                          ensure_ascii=False, indent=2))
     else:
-        in_text(kqs)
+        print_report(kqs)
 
     sys.exit(1 if any(not k.dat() for k in kqs) else 0)
 

@@ -46,7 +46,7 @@ for _luong in (sys.stdout, sys.stderr):
 # sách cấm: bản engine sau thêm khoá mới thì khoá đó bị bỏ qua, thay vì lọt ra
 # vì chưa ai kịp thêm nó vào danh sách cấm. `text` không có tên ở đây, và đó là
 # toàn bộ điểm của file này.
-KHOA_SO_LIEU = (
+METRIC_KEYS = (
     "filename",
     "source_file",
     "format",
@@ -67,10 +67,10 @@ KHOA_SO_LIEU = (
 
 # Tiêu đề chương trích ra làm mẫu — cắt ở đây để một cuốn 300 chương không tự nó
 # thành một khối lớn trong ngữ cảnh.
-SO_TIEU_DE_MAU = 5
+SAMPLE_TITLE_COUNT = 5
 
 
-def ra(trang_thai, ma_thoat, **them):
+def emit(trang_thai, ma_thoat, **them):
     """In đúng một object JSON rồi thoát. Không có đường nào khác ra khỏi script."""
     print(json.dumps({"trang_thai": trang_thai, **them}, ensure_ascii=False, indent=2))
     sys.exit(ma_thoat)
@@ -78,13 +78,13 @@ def ra(trang_thai, ma_thoat, **them):
 
 def main():
     if len(sys.argv) != 2:
-        ra("thieu_tham_so", 1, thong_diep="Dùng: giam-dinh.py <đường-dẫn-sách>")
+        emit("thieu_tham_so", 1, thong_diep="Dùng: giam-dinh.py <đường-dẫn-sách>")
 
     try:
         import book_to_skill
         from book_to_skill import config
     except ImportError as e:
-        ra(
+        emit(
             "engine_chua_cai",
             3,
             thong_diep=str(e),
@@ -97,19 +97,19 @@ def main():
     try:
         duong_dan = duong_dan.resolve()
     except OSError as e:
-        ra("khong_phai_file", 1, duong_dan=str(duong_dan), thong_diep=str(e))
+        emit("khong_phai_file", 1, duong_dan=str(duong_dan), thong_diep=str(e))
 
     # Phép kiểm 1 — là file thật, không phải thư mục.
     # `exists()` trả True cho một thư mục tên `sach.epub`; nó sẽ lọt xuống engine
     # rồi lĩnh ExtractionError và bị gán oan là bản hỏng.
     if not duong_dan.is_file():
-        ra("khong_phai_file", 1, duong_dan=str(duong_dan))
+        emit("khong_phai_file", 1, duong_dan=str(duong_dan))
 
     # Phép kiểm 2 — đuôi nằm trong danh sách engine nhận, SO SAU KHI HẠ CHỮ THƯỜNG.
     # Hằng số chỉ chứa đuôi chữ thường, nên so thẳng sẽ từ chối oan một `.EPUB` tốt.
     duoi = duong_dan.suffix.lower()
     if duoi not in config.SUPPORTED_EXTENSIONS:
-        ra(
+        emit(
             "duoi_khong_ho_tro",
             1,
             duong_dan=str(duong_dan),
@@ -119,7 +119,7 @@ def main():
 
     # Phép kiểm 3 — kích thước lớn hơn 0.
     if duong_dan.stat().st_size == 0:
-        ra("file_rong", 1, duong_dan=str(duong_dan))
+        emit("file_rong", 1, duong_dan=str(duong_dan))
 
     # Engine in tiến trình ("Extracting EPUB: ...", "Trying pypdf...") thẳng ra
     # stdout. Không chặn thì nó lẫn vào JSON và bên gọi parse gãy — đã gặp thật ở
@@ -132,16 +132,16 @@ def main():
         # Ba phép kiểm đã qua, nên đây mới là bản hỏng thật. Chuỗi lỗi trả về cho
         # người đọc hiểu chuyện gì, KHÔNG để phân loại lỗi bằng cách so chuỗi —
         # chuỗi đó không phải hợp đồng ổn định giữa các phiên bản engine.
-        ra("khong_rut_duoc_chu", 2, duong_dan=str(duong_dan), thong_diep=str(e))
+        emit("khong_rut_duoc_chu", 2, duong_dan=str(duong_dan), thong_diep=str(e))
 
-    so_lieu = {k: ket_qua[k] for k in KHOA_SO_LIEU if k in ket_qua}
+    so_lieu = {k: ket_qua[k] for k in METRIC_KEYS if k in ket_qua}
 
     mau = so_lieu.get("chapter_headings_sample")
-    if isinstance(mau, list) and len(mau) > SO_TIEU_DE_MAU:
-        so_lieu["chapter_headings_sample"] = mau[:SO_TIEU_DE_MAU]
-        so_lieu["chapter_headings_da_cat"] = len(mau) - SO_TIEU_DE_MAU
+    if isinstance(mau, list) and len(mau) > SAMPLE_TITLE_COUNT:
+        so_lieu["chapter_headings_sample"] = mau[:SAMPLE_TITLE_COUNT]
+        so_lieu["chapter_headings_da_cat"] = len(mau) - SAMPLE_TITLE_COUNT
 
-    ra("ok", 0, duong_dan=str(duong_dan), so_lieu=so_lieu)
+    emit("ok", 0, duong_dan=str(duong_dan), so_lieu=so_lieu)
 
 
 if __name__ == "__main__":
