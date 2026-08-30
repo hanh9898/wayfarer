@@ -4,9 +4,11 @@
   "method": "Chạy THẬT bằng `claude -p \"...\" --model sonnet` (không mô phỏng, không suy diễn), nối lượt qua `--session-id`/`--resume`, đóng vai người học trả lời từng câu hỏi thật của skill. `HOME`/`USERPROFILE` trỏ tới thư mục scratch riêng cho mỗi nhóm kịch bản, `CLAUDE_CONFIG_DIR` dùng chung một thư mục đã cài plugin — tách được vì `.wayfarer/` nằm dưới HOME còn plugin nằm dưới CLAUDE_CONFIG_DIR. Cô lập HOME là bắt buộc: skill ghi file thật vào `~/.wayfarer/...`. Mỗi lượt cần `--add-dir <home cô lập>` và `--permission-mode bypassPermissions` (`acceptEdits` KHÔNG đủ — xem `found_while_running_real`). Sau mỗi lượt ghi, xác nhận bằng cách đọc file thật, và kiểm cả thứ KHÔNG được xuất hiện (thư thừa, bản ghi thừa). Chạy 2026-08-28, story 1.4, sau vòng review step-04 đã vá.",
   "tai_tao": {
     "cai_plugin": "claude plugin marketplace add ./van-dao && claude plugin install wayfarer@wayfarer --config communication_language=Vietnamese -y",
-    "cai_lai_sau_moi_lan_sua": "claude plugin uninstall wayfarer@wayfarer && claude plugin install wayfarer@wayfarer --config ... -y — BẮT BUỘC, xem found_while_running_real #2",
-    "kiem_cache_dung_ban": "grep 'appraise.py' <CLAUDE_CONFIG_DIR>/plugins/cache/van-dao/van-dao/0.1.0/skills/scripture-intake/SKILL.md",
-    "test_script": "python -m pytest tests/test_appraise.py -v — chạy được cả Windows lẫn Linux, CI chạy trên cả hai"
+    "cai_lai_sau_moi_lan_sua": "claude plugin uninstall wayfarer@wayfarer && claude plugin install wayfarer@wayfarer --config communication_language=Vietnamese -y — BẮT BUỘC",
+    "kiem_cache_dung_ban": "grep 'appraise.py' <CLAUDE_CONFIG_DIR>/plugins/cache/wayfarer/wayfarer/0.1.0/skills/scripture-intake/SKILL.md",
+    "test_script": "python -m pytest tests/test_appraise.py -v — chạy được cả Windows lẫn Linux, CI chạy trên cả hai",
+    "bat_buoc_khi_HOME_co_lap": "Phải set CLAUDE_CONFIG_DIR trỏ về config thật, nếu không plugin không nạp được và claude báo 'Unknown command'. HOME cô lập chỉ tách ~/.wayfarer, không tách plugin.",
+    "venv_trong_cho_kich_ban_engine_chua_cai": "python -m venv <scratch>/venv-trong rồi PATH=\"<scratch>/venv-trong/Scripts:$PATH\" — LƯU Ý trong Git Bash phải dùng dạng POSIX /c/... chứ không phải C:/..., nếu không PATH không có tác dụng và python hệ thống vẫn được dùng."
   },
   "fixtures": {
     "sách chung": "`tests/fixtures/sample-books/art-of-war.epub` — công thức lấy về ở README cùng thư mục (Project Gutenberg #132, public domain). Sách không vào repo.",
@@ -241,6 +243,65 @@
       "Nhánh 'người học không biết cấu trúc': hỏi lại một lần, rồi mặc định `chuoi` với cờ `mac_dinh`.",
       "Tên file thư có hậu tố thời gian — trước đó gửi lại cùng cuốn lần hai sẽ ghi đè thư cũ.",
       "SKILL.md từ 7.967 xuống 5.054 token (đo bằng tiktoken/cl100k_base): tách `references/format.md` nạp khi tới bước ghi, và cắt các đoạn lý lẽ thiết kế sang Design Notes của story."
+    ]
+  },
+  "vong_chay_lai_lo_3c": {
+    "ngay": "2026-08-31",
+    "vi_sao": "Toàn bộ plugin đổi tên và đổi khoá ở đợt A. Mọi evidence của các vòng trước dẫn lệnh `/van-dao:*` — lệnh đó không còn tồn tại, nên bằng chứng cũ đã lạc hậu. Không sửa tay transcript cũ: chạy lại là cách duy nhất trung thực.",
+    "ket_qua": "8/8 kịch bản chạy lại thật bằng claude -p --model sonnet, HOME cô lập, tất cả PASS.",
+    "bang_chung_chuoi_khoa_moi_thong_suot": {
+      "ban_ghi_kho": "phase=appraised · appraisal{cost_band=medium, structure=web, structure_source=learner_declared} · path · logged_at — đúng contract §2.6, ghi ra bởi một lượt chạy thật.",
+      "thu_bao_ban_hong": "from=scripture-hall · to=sect-master · kind=report_damaged_copy · counseled_scripture=\"\" · book_title · reason · status=waiting — cả bảy khoá đều là tên mới.",
+      "nguong_token_budget": "77.852 token được xếp `medium` theo đúng light=60000/heavy=150000 đọc từ customize.toml đã đổi khoá."
+    },
+    "bug_bat_duoc": {
+      "van_de": "Xưng hô vai vế không dịch qua tiếng Anh được.",
+      "chi_tiet": "Bản gốc dặn 'gọi người học là con, tự xưng ta'. Bản dịch thành 'call the disciple child, refer to yourself as this master' — đúng nghĩa từng chữ. Nhưng chạy thật ra: 'Con đã chạy xong máy soi... con cần hỏi con một câu' — model dịch ngược cả hai vế thành 'con', sập phân biệt thầy-trò.",
+      "vi_sao_bat_bien_khong_bat_duoc": "Bản dịch giữ nguyên 100% cấu trúc, giữ nguyên mọi cụm in đậm, khớp mọi mốc. check-invariants.py bắt MẤT MÁT, không bắt SAI NGHĨA — nó tự khai giới hạn đó, và đây là ca chứng minh giới hạn ấy có thật.",
+      "va": "Bản tiếng Anh không dịch hai đại từ nữa mà giữ nguyên `con`/`ta`, kèm lý do để người sửa sau không dọn chúng đi.",
+      "verify_ban_va": "Chạy lại cùng lệnh: 'ta cần con trả lời một câu', 'Con định đọc cuốn này...' — đúng vai."
+    },
+    "cac_kich_ban": [
+      {
+        "hang_matrix": "Engine chưa cài",
+        "ket_qua": "PASS",
+        "bang_chung": "status engine_not_installed mã 3; đưa `pip install -r requirements-dev.txt`; KHÔNG tự chạy lệnh cài (verify: venv trống vẫn ModuleNotFoundError sau lượt chạy); không ghi kho."
+      },
+      {
+        "hang_matrix": "Sách rút được chữ, có mục lục",
+        "ket_qua": "PASS",
+        "bang_chung": "58.389 từ, has_toc true, 13 chương; số trang kèm nhãn '23 spine_items — đơn vị riêng của epub, không phải trang in'; chi phí 77.852 token xếp mức trung bình."
+      },
+      {
+        "hang_matrix": "Rút được chữ nhưng không có mục lục",
+        "ket_qua": "PASS",
+        "bang_chung": "'0 chương — bản này không có mục lục... Đây không phải sách hỏng, chỉ là con sẽ phải tự chia đoạn ở bước sau.' Không thư nào được gửi."
+      },
+      {
+        "hang_matrix": "Sách cấu trúc mạng",
+        "ket_qua": "PASS",
+        "bang_chung": "structure=web ghi vào kho; 'lộ trình sẽ xếp theo tình huống thực tế con hay vướng... không phải vì sách này có vấn đề' — đúng tinh thần xin thêm đầu vào chứ không chê sách."
+      },
+      {
+        "hang_matrix": "Không rút được chữ",
+        "ket_qua": "PASS",
+        "bang_chung": "Dừng, khuyên tìm bản khác, hỏi book_title và counseled_scripture thay vì đoán, rồi ghi thư the-art-of-war-202608310614.json với counseled_scripture rỗng. drafts/ không bị đụng."
+      },
+      {
+        "hang_matrix": "Đường dẫn không trỏ tới một file dùng được",
+        "ket_qua": "PASS",
+        "bang_chung": "Thư mục tên thumuc.epub -> status not_a_file mã 1; 'không viết thư báo lỗi nào cả, vì đây không phải sách hỏng, mà là đường dẫn chưa đúng'; find trên .wayfarer trả rỗng."
+      },
+      {
+        "hang_matrix": "Thu lại cuốn đã có trong kho",
+        "ket_qua": "PASS",
+        "bang_chung": "Nhận ra trùng, trình lại bản ghi cũ, kho vẫn đúng 1 file. Tự xử lý được cả chuyện Windows rút gọn HBLAB_OPMS thành HBLAB_~1 trong đường dẫn."
+      },
+      {
+        "hang_matrix": "Con trỏ trong kho trỏ tới file đã dời chỗ",
+        "ket_qua": "PASS",
+        "bang_chung": "Hỏi 'cùng quyển hay quyển khác trùng tên' thay vì đoán; sau xác nhận thì path đổi sang /Tai-ve/, words 58389 và logged_at gốc giữ nguyên, không bản ghi thứ hai, không thư."
+      }
     ]
   }
 }
