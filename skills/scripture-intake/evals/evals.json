@@ -1,205 +1,205 @@
 {
-  "skill_name": "thu-bi-kip",
-  "level": "nhẹ — 8 kịch bản phủ đủ 8 dòng I/O matrix của story, cộng ba ca biên tìm ra ở vòng review (trùng tên file, người học không biết cấu trúc, đuôi viết hoa). Chưa phải mức đầy đủ 20-câu/60-40.",
-  "method": "Chạy THẬT bằng `claude -p \"...\" --model sonnet` (không mô phỏng, không suy diễn), nối lượt qua `--session-id`/`--resume`, đóng vai người học trả lời từng câu hỏi thật của skill. `HOME`/`USERPROFILE` trỏ tới thư mục scratch riêng cho mỗi nhóm kịch bản, `CLAUDE_CONFIG_DIR` dùng chung một thư mục đã cài plugin — tách được vì `.wayfarer/` nằm dưới HOME còn plugin nằm dưới CLAUDE_CONFIG_DIR. Cô lập HOME là bắt buộc: skill ghi file thật vào `~/.wayfarer/...`. Mỗi lượt cần `--add-dir <home cô lập>` và `--permission-mode bypassPermissions` (`acceptEdits` KHÔNG đủ — xem `found_while_running_real`). Sau mỗi lượt ghi, xác nhận bằng cách đọc file thật, và kiểm cả thứ KHÔNG được xuất hiện (thư thừa, bản ghi thừa). Chạy 2026-08-28, story 1.4, sau vòng review step-04 đã vá.",
+  "skill_name": "scripture-intake",
+  "level": "light — 8 scenarios covering all 8 rows of the story's I/O matrix, plus three edge cases found in the review round (duplicate filename, learner does not know the structure, uppercase extension). Not yet the full 20-question/60-40 level.",
+  "method": "Run FOR REAL with `claude -p \"...\" --model sonnet` (no simulation, no inference), chaining turns via `--session-id`/`--resume`, playing the learner and answering each of the skill's actual questions. `HOME`/`USERPROFILE` points at a separate scratch directory per scenario group, while `CLAUDE_CONFIG_DIR` shares one directory that already has the plugin installed — the split works because `.wayfarer/` lives under HOME while the plugin lives under CLAUDE_CONFIG_DIR. Isolating HOME is mandatory: the skill writes real files into `~/.wayfarer/...`. Every turn needs `--add-dir <isolated home>` and `--permission-mode bypassPermissions` (`acceptEdits` is NOT enough — see `found_while_running_real`). After every writing turn, confirm by reading the real file, and check for what must NOT appear as well (a stray letter, a stray record). Run 2026-08-28, story 1.4, after the step-04 review round patches.",
   "reproduce": {
     "install_plugin": "claude plugin marketplace add ./van-dao && claude plugin install wayfarer@wayfarer --config communication_language=Vietnamese -y",
-    "reinstall_after_each_edit": "claude plugin uninstall wayfarer@wayfarer && claude plugin install wayfarer@wayfarer --config communication_language=Vietnamese -y — BẮT BUỘC",
+    "reinstall_after_each_edit": "claude plugin uninstall wayfarer@wayfarer && claude plugin install wayfarer@wayfarer --config communication_language=Vietnamese -y — MANDATORY",
     "verify_cache_version": "grep 'appraise.py' <CLAUDE_CONFIG_DIR>/plugins/cache/wayfarer/wayfarer/0.1.0/skills/scripture-intake/SKILL.md",
-    "test_script": "python -m pytest tests/test_appraise.py -v — chạy được cả Windows lẫn Linux, CI chạy trên cả hai",
-    "required_when_home_isolated": "Phải set CLAUDE_CONFIG_DIR trỏ về config thật, nếu không plugin không nạp được và claude báo 'Unknown command'. HOME cô lập chỉ tách ~/.wayfarer, không tách plugin.",
-    "empty_venv_for_engine_missing": "python -m venv <scratch>/venv-trong rồi PATH=\"<scratch>/venv-trong/Scripts:$PATH\" — LƯU Ý trong Git Bash phải dùng dạng POSIX /c/... chứ không phải C:/..., nếu không PATH không có tác dụng và python hệ thống vẫn được dùng."
+    "test_script": "python -m pytest tests/test_appraise.py -v — runs on both Windows and Linux; CI runs both.",
+    "required_when_home_isolated": "CLAUDE_CONFIG_DIR must point at the real config, otherwise the plugin does not load and claude reports 'Unknown command'. An isolated HOME only separates ~/.wayfarer, it does not separate the plugin.",
+    "empty_venv_for_engine_missing": "python -m venv <scratch>/venv-trong then PATH=\"<scratch>/venv-trong/Scripts:$PATH\" — NOTE: in Git Bash you must use the POSIX form /c/... and not C:/..., otherwise PATH has no effect and the system python is still the one used."
   },
   "fixtures": {
-    "shared_book": "`tests/fixtures/sample-books/art-of-war.epub` — công thức lấy về ở README cùng thư mục (Project Gutenberg #132, public domain). Sách không vào repo.",
-    "ghi-chep-phang.txt": "Sinh tại chỗ: văn xuôi phẳng ~61 KB, không tiêu đề chương nào → `chapters_detected = 0`, `has_toc = False`.",
-    "ban-hong.pdf": "Chính `art-of-war.epub` đổi đuôi thành `.pdf`. Qua cả ba phép kiểm đường dẫn rồi mới hỏng ở engine — ca DUY NHẤT được phép sinh ra một lá thư.",
-    "thumuc.epub": "Một THƯ MỤC rỗng đặt tên có đuôi `.epub`.",
-    "art-of-war.epub in three folders": "Cùng tên file ở `Sach/`, `Tai-ve/`, `Ban-khac/` — dựng ca trùng tên file mà không chắc cùng cuốn.",
-    "clean_venv": "venv Python trống (`python -m venv`), đặt lên đầu `PATH` để `import book_to_skill` thất bại thật. Trên Git Bash phải dùng dạng POSIX `/c/Users/...`, không phải `C:/Users/...` — xem found_while_running_real #3."
+    "shared_book": "`tests/fixtures/sample-books/art-of-war.epub` — the fetch recipe is in the README in that same directory (Project Gutenberg #132, public domain). The book itself is not committed to the repo.",
+    "ghi-chep-phang.txt": "Generated on the spot: ~61 KB of flat prose with no chapter heading at all → `chapters_detected = 0`, `has_toc = False`.",
+    "ban-hong.pdf": "`art-of-war.epub` itself with its extension changed to `.pdf`. It passes all three path checks and only then fails inside the engine — the ONLY case allowed to produce a letter.",
+    "thumuc.epub": "An empty DIRECTORY named with an `.epub` extension.",
+    "art-of-war.epub in three folders": "The same filename in `Sach/`, `Tai-ve/`, `Ban-khac/` — sets up the duplicate-filename case where it is not certain the books are the same one.",
+    "clean_venv": "An empty Python venv (`python -m venv`), placed at the front of `PATH` so that `import book_to_skill` genuinely fails. On Git Bash you must use the POSIX form `/c/Users/...`, not `C:/Users/...` — see found_while_running_real #3."
   },
   "evals": [
     {
       "id": 1,
-      "matrix_row": "Engine chưa cài trên máy",
-      "setup": "Home cô lập sạch (`C`). `PATH` đặt venv trống lên đầu; xác nhận trước khi chạy: `python -c \"import book_to_skill\"` in ra `venv sach`.",
+      "matrix_row": "Engine not installed on the machine",
+      "setup": "Clean isolated home (`C`). `PATH` has the empty venv at its front; confirm before running: `python -c \"import book_to_skill\"` prints `venv sach`.",
       "prompt": "\"/wayfarer:scripture-intake <home>/Sach/art-of-war.epub\"",
-      "expected_output": "Script trả mã thoát 3; skill nói rõ engine chưa có kèm đúng lệnh cài và đường dẫn gốc plugin; không tự chạy lệnh cài; dừng; không ghi gì.",
+      "expected_output": "The script returns exit code 3; the skill states plainly that the engine is missing, together with the correct install command and the plugin root path; it does not run the install command itself; it stops; it writes nothing.",
       "expectations": [
         {
-          "text": "Nói rõ engine chưa cài, đưa đúng lệnh cài KÈM đường dẫn gốc plugin cụ thể (không phải cụm mơ hồ \"gốc mã nguồn\").",
+          "text": "States plainly that the engine is not installed, and gives the correct install command WITH the concrete plugin root path (not a vague phrase like \"the source root\").",
           "evidence": "Session b6f24d80-3a17-4e59-8c02-51fd9a73e6b4: \"Con, engine đọc sách (`book_to_skill`) chưa được cài trên máy này — chạy script giám định thì báo lỗi thiếu module, chưa động tới được nội dung file `art-of-war.epub`.\\n\\nLệnh cần chạy để cài, từ thư mục gốc của plugin (`C:\\\\Users\\\\HBLAB_OPMS\\\\Projects\\\\van-dao-workspace\\\\van-dao`):\\n\\n```\\npip install -r requirements-dev.txt\\n```\" — skill tự tra ra đường dẫn thật, không đọc thuộc lòng."
         },
         {
-          "text": "Không tự chạy lệnh cài.",
+          "text": "Does not run the install command itself.",
           "evidence": "Cùng session: \"Ta không tự chạy lệnh này — cài gói vào máy là việc cần con quyết định và bấm.\""
         },
         {
-          "text": "Script trả JSON có cấu trúc thay vì stack trace thô, và skill phân nhánh theo mã thoát.",
+          "text": "The script returns structured JSON instead of a raw stack trace, and the skill branches on the exit code.",
           "evidence": "Cùng session: \"nó chỉ làm ba phép kiểm đường dẫn rồi mới import engine bên trong, để nếu engine thiếu, script vẫn trả về JSON có cấu trúc (mã thoát 3) thay vì một stack trace thô.\""
         },
         {
-          "text": "Không ghi gì.",
+          "text": "Writes nothing.",
           "evidence": "`ls -la <home>/.wayfarer` ngay sau lượt chạy: thư mục không tồn tại."
         }
       ]
     },
     {
       "id": 2,
-      "matrix_row": "Sách rút được chữ, có mục lục",
-      "setup": "Home cô lập sạch (`A`), sách chung tại `<home>/Sach/art-of-war.epub`.",
+      "matrix_row": "Book extracts text, has a table of contents",
+      "setup": "Clean isolated home (`A`), the shared book at `<home>/Sach/art-of-war.epub`.",
       "prompt": "Lượt 1: \"/wayfarer:scripture-intake <home>/Sach/art-of-war.epub\". Lượt 2: \"doc tu dau den cuoi\". Lượt 3: \"u ghi di\".",
-      "expected_output": "Chạy script (không gọi engine trực tiếp), hỏi cấu trúc bằng lời người học trả lời được, trình đủ bốn phép giám định kèm số trang có nhãn, ghi rồi kiểm.",
+      "expected_output": "Runs the script (does not call the engine directly), asks about structure in words the learner can actually answer, presents all four appraisal checks with a labelled page count, writes and then verifies.",
       "expectations": [
         {
-          "text": "Gọi qua script chứ không gọi engine trực tiếp, và script chạy được từ thư mục cache của plugin đã cài.",
+          "text": "Goes through the script rather than calling the engine directly, and the script runs from the installed plugin's cache directory.",
           "evidence": "Session b2d47f61-8a05-4c39-9e17-3f602d85a4e1, lượt 1: \"Script chạy xong, mã thoát 0 (`trang_thai: ok`) — sách rút được chữ tốt.\""
         },
         {
-          "text": "Hỏi cấu trúc bằng câu người đang cầm sách trả lời được, KHÔNG hỏi thẳng \"chuỗi hay mạng\".",
+          "text": "Asks about structure with a question someone holding the book can answer, NOT by asking outright \"chain or web\".",
           "evidence": "Lượt 1: \"> Cuốn *Art of War* này con định đọc từ đầu đến cuối, hay là loại tra tới đâu đọc tới đó — cần chỗ nào giở chỗ ấy?\""
         },
         {
-          "text": "Số trang trình kèm nhãn đơn vị, không nói trần \"23 trang\".",
+          "text": "The page count is presented with a unit label, not stated bare as \"23 pages\".",
           "evidence": "Lượt 1: \"bản EPUB này rút ra được **23 spine_items** (đơn vị đếm của EPUB — không phải trang giấy, EPUB vốn không có khái niệm trang cố định)\""
         },
         {
-          "text": "Ước chi phí quy về pha sau, so với mốc đã nạp từ customize.toml.",
+          "text": "Estimates the cost attributable to the later phases, compared against the thresholds loaded from customize.toml.",
           "evidence": "Lượt 1: \"Ước chi phí xử lý cho các pha phía sau: **~77.852 token** — nằm giữa mốc `nhe = 60.000` và `nang = 150.000`, tức mức **vừa**\""
         },
         {
-          "text": "Ghi con trỏ + giám định, đọc lại kiểm khớp; bản ghi KHÔNG chứa khoá `text`.",
+          "text": "Writes the pointer + appraisal, then reads it back to check it matches; the record does NOT contain a `text` key.",
           "evidence": "File thật `<home>/.wayfarer/scripture-hall/drafts/art-of-war.json`: `\"duong_dan\"` trỏ `.../Sach/art-of-war.epub`, `\"words\": 58389`, `\"estimated_tokens\": 77852`, `\"muc_chi_phi\": \"vua\"`, `\"pages\": 23`, `\"pages_label\": \"spine_items\"`, `\"cau_truc\": \"chuoi\"`, `\"cau_truc_nguon\": \"nguoi_hoc_khai\"`. Không có khoá `text` — script không trả nó ra."
         },
         {
-          "text": "Xưng hô nhất quán \"ta\"/\"con\" như SKILL.md quy định.",
+          "text": "Uses the `ta`/`con` forms of address consistently, as SKILL.md requires.",
           "evidence": "Lượt 3: \"Con đồng ý để ta ghi bản ghi này vào `tang-kinh/nhap-dang-do/` không?\" — trước vòng review, cùng một loạt chạy còn lẫn \"bạn\" ở nhánh từ chối."
         }
       ]
     },
     {
       "id": 3,
-      "matrix_row": "Rút được chữ nhưng không có mục lục",
-      "setup": "Home `B`, fixture `ghi-chep-phang.txt` (đã xác nhận trước: `chapters_detected = 0`, `has_toc = False`, `words = 13920`).",
+      "matrix_row": "Text extracts but there is no table of contents",
+      "setup": "Home `B`, fixture `ghi-chep-phang.txt` (confirmed beforehand: `chapters_detected = 0`, `has_toc = False`, `words = 13920`).",
       "prompt": "\"/wayfarer:scripture-intake <home>/Sach/ghi-chep-phang.txt\"",
-      "expected_output": "Báo rõ không lấy được mục lục rồi VẪN ĐI TIẾP; không coi là sách hỏng.",
+      "expected_output": "Reports plainly that no table of contents could be obtained and then STILL CONTINUES; does not treat it as a damaged copy.",
       "expectations": [
         {
-          "text": "Báo rõ, nói thẳng không phải lỗi, đi tiếp sang phép giám định còn lại.",
+          "text": "Reports it plainly, says outright that this is not a fault, and moves on to the remaining appraisal checks.",
           "evidence": "Session a4b71e39-5c28-4f60-b913-7d05e2a86c14, lượt 1: \"Mục lục thì không lấy được (`has_toc = false`, 0 chương dò được) — không sao, con vẫn dùng được sách, chỉ là ta sẽ để con tự xếp chương ở bước sau\". Ngay sau đó vẫn hỏi tiếp phép giám định thứ ba."
         },
         {
-          "text": "Số trang = 0 vẫn trình kèm nhãn.",
+          "text": "A page count of 0 is still presented with its label.",
           "evidence": "Lượt 3: \"Số trang: **0 sections** (định dạng `txt` không tính theo trang, đơn vị đo là \\\"sections\\\").\""
         }
       ]
     },
     {
       "id": 4,
-      "matrix_row": "Sách cấu trúc mạng · và ca người học KHÔNG BIẾT (vá ở vòng review)",
-      "setup": "Ca `mang`: session 1a9d4c72-6e83-4b57-9f20-3d8c5a61e094 (bản trước vòng review — hành vi nhánh này không đổi). Ca không-biết: tiếp session của eval 3.",
+      "matrix_row": "Book with web structure · and the case where the learner DOES NOT KNOW (patched in the review round)",
+      "setup": "The `web` case: session 1a9d4c72-6e83-4b57-9f20-3d8c5a61e094 (the pre-review build — this branch's behaviour is unchanged). The does-not-know case: continues the session from eval 3.",
       "prompt": "Ca mạng: \"tra toi dau doc toi do thoi, can cho nao gio cho ay\". Ca không-biết: \"toi khong biet nua, chac ca hai\" rồi \"that su toi chua ro, chua dung bao gio\".",
-      "expected_output": "Ca mạng: suy ra `mang`, nói rõ sẽ cần tình huống thật — xin thêm đầu vào, không phải chê sách. Ca không-biết: hỏi lại MỘT lần bằng cách khác, vẫn không rõ thì lấy `chuoi` với cờ `mac_dinh` và nói rõ là tạm chọn.",
+      "expected_output": "The web case: infers `web`, states plainly that real situations will be needed — this is asking for more input, not criticising the book. The does-not-know case: asks again ONCE, phrased differently; if it is still unclear, takes `chain` with the `default` flag and says plainly that this is a provisional choice.",
       "expectations": [
         {
-          "text": "Suy ra `mang` từ câu trả lời, và khung lại việc xin tình huống là xin thêm đầu vào.",
+          "text": "Infers `web` from the answer, and frames the request for situations as asking for more input.",
           "evidence": "Session 1a9d4c72-...: \"Rõ rồi — con muốn tra tới đâu đọc tới đó, nên cấu trúc là **mạng** (tra cứu theo nhu cầu), không phải đọc tuần tự.\" và \"Đây là xin thêm đầu vào từ con, không phải vì cuốn này thiếu gì.\""
         },
         {
-          "text": "Người học nói không biết → hỏi lại đúng MỘT lần bằng cách diễn đạt khác, không lặp lại câu cũ.",
+          "text": "The learner says they do not know → asks again exactly ONCE with different wording, without repeating the old question.",
           "evidence": "Session a4b71e39-..., lượt 2: \"Rõ rồi, để ta hỏi theo cách khác cho dễ hình dung: **con dùng cuốn này để học nghề từ đầu, hay để tra cứu khi vướng việc?**\""
         },
         {
-          "text": "Vẫn không rõ → lấy `chuoi` với cờ `mac_dinh`, nói rõ là tạm chọn và đổi được.",
+          "text": "Still unclear → takes `chain` with the `default` flag, saying plainly that it is a provisional choice and can be changed later.",
           "evidence": "Lượt 3: \"Vậy ta tạm chọn giúp con: xếp cuốn này vào loại **đọc tuần tự** (`chuoi`), cờ đánh dấu là *mặc định* chứ không phải con chọn — sau này thấy sai thì đổi lại được, không cố định.\" File thật ghi `\"cau_truc\": \"chuoi\"`, `\"cau_truc_nguon\": \"mac_dinh\"`."
         }
       ]
     },
     {
       "id": 5,
-      "matrix_row": "Không rút được chữ",
-      "setup": "Home `B`, fixture `ban-hong.pdf`. Script đã xác nhận trả mã thoát 2 (`pytest tests/test_appraise.py::test_ban_hong_that_ra_ma_thoat_rieng`).",
+      "matrix_row": "No text can be extracted",
+      "setup": "Home `B`, fixture `ban-hong.pdf`. The script is confirmed to return exit code 2 (`pytest tests/test_appraise.py::test_ban_hong_that_ra_ma_thoat_rieng`).",
       "prompt": "Lượt 1: \"/wayfarer:scripture-intake <home>/Sach/ban-hong.pdf\". Lượt 2: \"co, truong mon co chi cho toi quyen Binh Phap Ton Tu\".",
-      "expected_output": "Dừng ngay, khuyên tìm bản khác, hỏi hai điều rồi gửi một thư đúng khuôn, không ghi gì vào kho.",
+      "expected_output": "Stops immediately, advises finding another copy, asks two things and then sends one letter in the correct shape, writing nothing into the hall.",
       "expectations": [
         {
-          "text": "Dừng ngay và khuyên tìm bản khác, phân biệt được bản hỏng với sách sai.",
+          "text": "Stops immediately and advises finding another copy, telling a damaged copy apart from a wrong book.",
           "evidence": "Session f38c6a14-9e02-4b75-8d43-16a0c7e5b923, lượt 1: \"Bản in này hỏng, không phải cuốn sách sai — con nên tìm một bản khác đúng định dạng.\""
         },
         {
-          "text": "Hỏi hai điều trước khi gửi thư, và nói rõ sẽ để trống thay vì đoán.",
+          "text": "Asks two things before sending the letter, and says plainly that it will leave the field empty rather than guess.",
           "evidence": "Lượt 1: \"1. Cuốn này có nằm trong danh sách Trưởng môn đã **chỉ điểm** cho con không? Nếu có, tên chỉ điểm đó là gì? (Không nhớ hoặc tự tìm được thì cứ nói — ta để trống trường đó, không đoán.)\\n2. Con gọi cuốn sách này là gì (tên sách)?\""
         },
         {
-          "text": "Thư đúng khuôn, có `ten_sach`, và tên file có hậu tố thời gian để lần gửi sau không ghi đè.",
+          "text": "The letter is in the correct shape, carries `book_title`, and its filename has a timestamp suffix so a later send does not overwrite it.",
           "evidence": "File thật `<home>/.wayfarer/handover/letters/binh-phap-ton-tu-202608301857.json`: `{\"schema\": 1, \"tu\": \"tang-kinh\", \"toi\": \"truong-mon\", \"hoi\": \"bao_ban_hong\", \"bi_kip_chi_diem\": \"binh-phap-ton-tu\", \"ten_sach\": \"Binh Pháp Tôn Tử\", \"ly_do\": \"File mang đuôi .pdf nhưng mở đầu bằng chữ ký PK\\\\x03\\\\x04 ...\", \"trang_thai\": \"cho\"}`"
         },
         {
-          "text": "Ca người học TỰ TÌM sách: `bi_kip_chi_diem` để trống, không đoán.",
+          "text": "The case where the learner FOUND the book themselves: `counseled_scripture` left empty, no guessing.",
           "evidence": "Session 6c0f3a89-2d47-4e15-b963-7a4e8c02f1d5 (chạy trên bản trước, nhánh này không đổi), trả lời \"khong phai tu chi diem nao dau, quyen nay toi tu tim tren mang\": thư ghi `\"bi_kip_chi_diem\": \"\"`, `\"ten_sach\": \"Binh Phap Ton Tu\"`."
         },
         {
-          "text": "Không có bản ghi nào trong kho, và nói thẳng phía nhận chưa dựng.",
+          "text": "No record in the hall, and it says outright that the receiving side is not built yet.",
           "evidence": "`ls <home>/.wayfarer/scripture-hall/drafts/` → thư mục không tồn tại. Lượt 2: \"việc Trưởng môn đọc hộp thư và tự cập nhật chỉ điểm ... **chưa dựng ở bản này**. Nó không tự động xảy ra\"."
         }
       ]
     },
     {
       "id": 6,
-      "matrix_row": "Đường dẫn không trỏ tới một file dùng được — cộng ca biên ngược (đuôi viết hoa)",
-      "setup": "Home `B`: thư mục `thumuc.epub`, file `ghi-chu.xyz`. Ca ngược `.EPUB` chạy ở session riêng trên bản trước (hành vi này giờ nằm trong script, đã khoá bằng `pytest::test_duoi_viet_hoa_van_nhan`).",
+      "matrix_row": "The path does not point at a usable file — plus the inverse edge case (uppercase extension)",
+      "setup": "Home `B`: directory `thumuc.epub`, file `ghi-chu.xyz`. The inverse `.EPUB` case ran in its own session on the earlier build (this behaviour now lives in the script and is locked down by `pytest::test_duoi_viet_hoa_van_nhan`).",
       "prompt": "Session e71f2c85 — lượt 1: thư mục `thumuc.epub`; lượt 2: \"the file nay thi sao: .../ghi-chu.xyz\".",
-      "expected_output": "Cả hai ca: script trả mã 1, skill nói rõ lý do, hỏi lại đường dẫn, không gọi engine, không gửi thư.",
+      "expected_output": "Both cases: the script returns code 1, the skill states the reason plainly, asks for the path again, does not call the engine, and sends no letter.",
       "expectations": [
         {
-          "text": "Thư mục đội lốt file bị script bắt bằng `is_file()`, và skill nói rõ đây KHÔNG phải bản hỏng.",
+          "text": "A directory masquerading as a file is caught by the script via `is_file()`, and the skill states plainly that this is NOT a damaged copy.",
           "evidence": "Session e71f2c85-4b39-4d07-9a68-25c4b3e08f16, lượt 1: \"Script giám định đã kiểm và báo `khong_phai_file`, nên ta dừng lại ở đây, chưa chạm gì tới engine cả.\\n\\nĐây không phải trường hợp \\\"sách hỏng\\\" — ta sẽ không gửi thư báo Trưởng môn, và kho `nhap-dang-do/` vẫn nguyên, chưa ghi gì.\""
         },
         {
-          "text": "Đuôi lạ bị chặn kèm danh sách định dạng lấy từ chính hằng số của engine.",
+          "text": "An unknown extension is blocked, together with the format list taken from the engine's own constant.",
           "evidence": "Lượt 2: \"Cũng là **chặn sớm**, mã 1 ... Đuôi engine nhận được: `.adoc`, `.asciidoc`, `.azw`, `.azw3`, `.docx`, `.epub`, `.htm`, `.html`, `.markdown`, `.md`, `.mobi`, `.pdf`, `.rst`, `.rtf`, `.text`, `.txt`, `.xhtml`.\" — 17 đuôi, khớp `SUPPORTED_EXTENSIONS` của bản đã ghim."
         },
         {
-          "text": "Ca biên ngược: file `.EPUB` viết hoa KHÔNG bị chặn oan.",
+          "text": "The inverse edge case: an uppercase `.EPUB` file is NOT blocked by mistake.",
           "evidence": "Session 3c81f5a0-7b46-4d92-a018-5f2e9c63b874: \"Cuốn này rút chữ được rồi — 58.389 từ, 13 chương phát hiện được, có mục lục.\" Hành vi này giờ nằm trong script và có test khoá lại: `test_duoi_viet_hoa_van_nhan` (11/11 pass)."
         }
       ]
     },
     {
       "id": 7,
-      "matrix_row": "Thu lại cuốn đã có trong kho · và ca TRÙNG TÊN FILE (vá ở vòng review)",
-      "setup": "Home `A` sau eval 2 — kho có `art-of-war.json`. Ca trùng tên: copy sách sang `Tai-ve/` rồi `Ban-khac/`, cùng tên file, đường dẫn khác.",
+      "matrix_row": "Re-intaking a book already in the hall · and the DUPLICATE FILENAME case (patched in the review round)",
+      "setup": "Home `A` after eval 2 — the hall holds `art-of-war.json`. The duplicate-filename case: copy the book into `Tai-ve/` and then `Ban-khac/`, same filename, different path.",
       "prompt": "Ca trùng tên: \"/wayfarer:scripture-intake <home>/Tai-ve/art-of-war.epub\" rồi trả lời \"cung mot cuon do\"; lần khác trả lời \"khong, day la mot ban dich khac toi moi tai\".",
-      "expected_output": "Chỉ khớp `filename` thì KHÔNG tự kết luận — trình bản ghi cũ ra và hỏi. Khớp `duong_dan` đúng thì báo trùng, không chạy script, không ghi đè.",
+      "expected_output": "A `filename`-only match must NOT be concluded on its own — present the old record and ask. An exact `path` match reports the duplicate, does not run the script, and does not overwrite.",
       "expectations": [
         {
-          "text": "Chỉ khớp tên file → hỏi người học, không tự kết luận, và nêu đúng hai khả năng.",
+          "text": "Filename-only match → asks the learner, does not conclude on its own, and states exactly the two possibilities.",
           "evidence": "Session c9e13b48-6d70-4a25-8f31-40b7e5c2a069: \"Chỉ tên file trùng, đường dẫn thì khác — có hai khả năng: đây là cùng một cuốn đã dời từ thư mục `Sach` sang `Tai-ve`, hoặc đây là một cuốn khác chỉ trùng tên file. Ta không tự đoán được — con cho ta biết:\" — kèm đường dẫn cũ, ngày ghi, số liệu lần trước để người học so."
         },
         {
-          "text": "Trả lời \"cuốn khác\" → đi tiếp như một cuốn mới, không báo trùng.",
+          "text": "Answered \"a different book\" → continues as a new book, does not report a duplicate.",
           "evidence": "Session d5a08e72-1c94-4b36-a7f0-92e63d1508bc, sau khi trả lời \"khong, day la mot ban dich khac toi moi tai\": \"Script chạy xong, rút được chữ tốt. Trước khi trình bốn phép giám định, ta cần hỏi con một câu...\""
         },
         {
-          "text": "Khớp `duong_dan` đúng → báo trùng ngay, KHÔNG chạy script, số liệu lấy từ bản ghi cũ.",
+          "text": "Exact `path` match → reports the duplicate at once, does NOT run the script, and takes the figures from the old record.",
           "evidence": "Session 4e8b71c3-9d52-4f18-a730-6b2c8e05d941 (bản trước vòng review, cùng hành vi): \"Kho đã có bản ghi cho đúng cuốn này rồi — `duong_dan` trong bản ghi khớp với đường dẫn con vừa đưa, và file đó vẫn tồn tại thật. Tôi dừng ở đây, **không gọi engine lại**.\""
         }
       ],
-      "note_previous_run": "Lượt chạy đầu tiên của kịch bản này (session 2b6f4a90) chạy trên bản khi phép kiểm kho còn nằm ở bước ghi — skill vẫn không ghi đè, nhưng phải rút chữ xong và hỏi một câu về cấu trúc rồi mới báo trùng. Đó là bằng chứng dẫn tới việc chuyển phép kiểm kho lên trước khi gọi engine."
+      "note_previous_run": "The first run of this scenario (session 2b6f4a90) ran on the build where the hall check still sat at the writing step — the skill still did not overwrite, but it had to finish extracting text and ask a structure question before it reported the duplicate. That is the evidence that led to moving the hall check ahead of the engine call."
     },
     {
       "id": 8,
-      "matrix_row": "Con trỏ trong kho trỏ tới file đã dời chỗ",
-      "setup": "Home `A`, file đã copy sang `Tai-ve/`; người học xác nhận là cùng cuốn.",
+      "matrix_row": "The pointer in the hall points at a file that has moved",
+      "setup": "Home `A`, the file copied into `Tai-ve/`; the learner confirms it is the same book.",
       "prompt": "Tiếp session c9e13b48: \"cung mot cuon do, toi vua chuyen sang thu muc Tai-ve\".",
-      "expected_output": "Cập nhật `duong_dan` của chính bản ghi đó, giữ nguyên số liệu và `ghi_luc`; không chạy lại script, không tạo bản ghi thứ hai, không gửi thư.",
+      "expected_output": "Updates `path` on that same record, keeping the figures and `logged_at` unchanged; does not re-run the script, does not create a second record, and sends no letter.",
       "expectations": [
         {
-          "text": "Chỉ đổi con trỏ, giữ nguyên mọi số liệu giám định và thời điểm ghi cũ.",
+          "text": "Changes only the pointer, keeping every appraisal figure and the original write time unchanged.",
           "evidence": "Session c9e13b48-...: \"con trỏ mới đã đúng, mọi số liệu giám định cũ (58.389 từ, 13 chương, cấu trúc chuỗi...) và thời điểm ghi lúc trước (2026-08-30 18:49:33) đều giữ nguyên. Chỉ mỗi `duong_dan` đổi sang `Tai-ve\\\\art-of-war.epub`.\" File thật xác nhận: `duong_dan` trỏ `Tai-ve`, `\"words\": 58389`, `\"ghi_luc\": \"2026-08-30T18:49:33+07:00\"` không đổi."
         },
         {
-          "text": "Không chạy lại script, không tạo bản ghi thứ hai, không gửi thư.",
+          "text": "Does not re-run the script, does not create a second record, and sends no letter.",
           "evidence": "Cùng lượt: \"Không chạy lại giám định, không tạo bản ghi mới, không gửi thư nào cả — vì đây không phải sách hỏng, chỉ là dời chỗ.\" Kiểm: kho vẫn đúng một `art-of-war.json`; `<home>/.wayfarer/ban-giao/` không tồn tại."
         }
       ]
@@ -207,98 +207,98 @@
   ],
   "found_while_running_real": [
     {
-      "problem": "`--permission-mode acceptEdits` KHÔNG đủ cho skill này.",
-      "detail": "Lượt chạy đầu tiên dừng lại vì mọi lệnh chứa từ `python` — kể cả `Get-Command python` chỉ để dò — đều bị từ chối với \"requires approval\". `acceptEdits` chỉ mở quyền sửa file, không mở quyền chạy lệnh; mà bước đầu của skill này là một lệnh chạy. Phải dùng `bypassPermissions`. Khác với `nhap-mon-ky`, nơi `acceptEdits` là đủ.",
-      "not_a_skill_defect": "Trong chính lượt bị chặn đó skill hành xử đúng: nó KHÔNG đoán kết quả phép kiểm engine mà dừng lại và hỏi — \"Tôi không muốn đoán mò kết quả của phép kiểm này (engine có cài hay không) — theo đúng luật của bí kíp, nếu chưa `import` được thì không được đi tiếp bất kỳ bước nào.\""
+      "problem": "`--permission-mode acceptEdits` is NOT enough for this skill.",
+      "detail": "The first run stalled because every command containing the word `python` — even a bare `Get-Command python` used only to probe — was refused with \"requires approval\". `acceptEdits` only grants file-editing permission, not command-running permission; and the first step of this skill is a command run. `bypassPermissions` is required. Unlike `initiation-record`, where `acceptEdits` is enough.",
+      "not_a_skill_defect": "In that very blocked turn the skill behaved correctly: it did NOT guess the result of the engine check but stopped and asked — \"Tôi không muốn đoán mò kết quả của phép kiểm này (engine có cài hay không) — theo đúng luật của bí kíp, nếu chưa `import` được thì không được đi tiếp bất kỳ bước nào.\""
     },
     {
-      "problem": "Plugin cache là BẢN COPY — sửa file rồi chạy eval mà không cài lại là đang kiểm bản cũ.",
-      "detail": "Sau khi vá SKILL.md, `grep` trong `<CLAUDE_CONFIG_DIR>/plugins/cache/van-dao/van-dao/0.1.0/skills/scripture-intake/SKILL.md` không ra nội dung mới — cache vẫn giữ bản trước. Phải uninstall rồi install lại, và xác nhận bằng một `grep` trên chính file trong cache TRƯỚC khi tin kết quả eval. Đây là cách âm thầm nhất để một lượt eval nói dối: nó chạy, nó trả lời, nhưng nó đang mô tả bản cũ."
+      "problem": "The plugin cache is a COPY — editing a file and then running evals without reinstalling means testing the old build.",
+      "detail": "After patching SKILL.md, a `grep` in `<CLAUDE_CONFIG_DIR>/plugins/cache/van-dao/van-dao/0.1.0/skills/scripture-intake/SKILL.md` did not return the new content — the cache still held the previous build. You must uninstall and reinstall, and confirm with a `grep` on the cached file itself BEFORE trusting any eval result. This is the quietest way for an eval run to lie: it runs, it answers, but it is describing the old build."
     },
     {
-      "problem": "Cô lập `python` qua `PATH` trong Git Bash cần đường dẫn dạng POSIX.",
-      "detail": "`export PATH=\"C:/Users/.../venv-sach/Scripts:$PATH\"` không có tác dụng — `which python` vẫn trỏ python hệ thống, và eval 'engine chưa cài' chạy nhầm thành ca engine có sẵn. Phải dùng `/c/Users/.../venv-sach/Scripts`. Kiểm bằng `which python` + một lượt `import` thật TRƯỚC khi tin rằng môi trường đã cô lập."
+      "problem": "Isolating `python` via `PATH` in Git Bash requires the POSIX path form.",
+      "detail": "`export PATH=\"C:/Users/.../venv-sach/Scripts:$PATH\"` has no effect — `which python` still points at the system python, and the 'engine not installed' eval silently ran as the engine-present case instead. You must use `/c/Users/.../venv-sach/Scripts`. Verify with `which python` plus one real `import` run BEFORE trusting that the environment is isolated."
     },
     {
-      "problem": "`.credentials.json` copy sang config cô lập có thể hết hạn giữa loạt eval.",
-      "detail": "Một lượt trả về \"Failed to authenticate: OAuth session expired and could not be refreshed\". Copy lại từ `~/.claude/.credentials.json` rồi chạy lại là xong — nhưng nếu không đọc kỹ output, lượt đó trông như một lượt skill im lặng không làm gì. Xoá mọi bản copy sau khi chạy xong (`find <scratch> -name .credentials.json -delete`)."
+      "problem": "A `.credentials.json` copied into the isolated config can expire in the middle of an eval batch.",
+      "detail": "One turn returned \"Failed to authenticate: OAuth session expired and could not be refreshed\". Copying it again from `~/.claude/.credentials.json` and re-running fixes it — but without reading the output carefully, that turn looks like a turn where the skill silently did nothing. Delete every copy once the batch is finished (`find <scratch> -name .credentials.json -delete`)."
     },
     {
-      "problem": "Engine in tiến trình ra STDOUT, lẫn vào JSON của script.",
-      "detail": "Lượt chạy đầu tiên của `bin/appraise.py` trả về `Extracting EPUB: ...` / `Trying pypdf...` đứng trước object JSON, nên bên gọi parse gãy. Đã vá bằng `contextlib.redirect_stdout(sys.stderr)` quanh lời gọi engine, và khoá lại bằng `test_stdout_chi_co_json`."
+      "problem": "The engine prints progress to STDOUT, mixing into the script's JSON.",
+      "detail": "The first run of `bin/appraise.py` returned `Extracting EPUB: ...` / `Trying pypdf...` ahead of the JSON object, so the caller's parse broke. Fixed with `contextlib.redirect_stdout(sys.stderr)` around the engine call, and locked down by `test_stdout_chi_co_json`."
     },
     {
-      "problem": "`pip install -r requirements-dev.txt` — lệnh chính skill bảo người dùng gõ — HỎNG trên Windows.",
-      "detail": "Chạy thật lần đầu (đúng finding của lens skill-quality: lệnh chưa từng ai gõ thử) cho `UnicodeDecodeError: 'charmap' codec can't decode byte 0x8d in position 195`. Nguyên nhân: file có comment tiếng Việt có dấu (UTF-8), mà pip đọc requirements bằng codec mặc định của hệ (cp1252 trên Windows). Đã vá bằng cách giữ `requirements-dev.txt` thuần ASCII. Sau khi vá, chạy lại trong venv sạch: mã thoát 0, `import book_to_skill` thành công, 17 đuôi hỗ trợ.",
-      "extra_note": "Lần chạy lại đầu tiên còn gặp `OSError ... enable-long-paths` — nhưng đó là artefact của đường dẫn scratchpad quá dài (giới hạn 260 ký tự của Windows), không phải lỗi của file. Dựng venv ở đường dẫn ngắn thì hết."
+      "problem": "`pip install -r requirements-dev.txt` — the very command the skill tells the user to type — is BROKEN on Windows.",
+      "detail": "The first real run (exactly the skill-quality lens finding: a command nobody had ever typed) gave `UnicodeDecodeError: 'charmap' codec can't decode byte 0x8d in position 195`. Cause: the file carried accented Vietnamese comments (UTF-8), while pip reads requirements with the system default codec (cp1252 on Windows). Fixed by keeping `requirements-dev.txt` pure ASCII. After the fix, a re-run in a clean venv: exit code 0, `import book_to_skill` succeeds, 17 supported extensions.",
+      "extra_note": "The first re-run also hit `OSError ... enable-long-paths` — but that is an artefact of an over-long scratchpad path (Windows' 260-character limit), not a fault in the file. Building the venv at a short path clears it."
     }
   ],
   "step04_review_round": {
-    "note": "Bảy thay đổi hành vi đến từ vòng review, mỗi cái có bằng chứng ở trên. Ghi lại đây để lần sau biết cái gì tìm ra bằng cách nào.",
+    "note": "Seven behavioural changes came out of the review round, each with its evidence above. Recorded here so that next time it is clear what was found and how.",
     "changes": [
-      "Bọc engine bằng `bin/appraise.py`: ràng buộc 'không đưa nội dung sách vào ngữ cảnh' từ một lời dặn trở thành một cơ chế — `text` không có đường ra khỏi script. Khoá bằng `test_khoa_text_khong_bao_gio_ra_stdout`.",
-      "Ba phép kiểm đường dẫn chuyển vào script, và hai ca 'đường dẫn sai' / 'sách hỏng thật' ra hai MÃ THOÁT khác nhau — ranh giới quyết định có gửi thư sang vai khác hay không giờ là cơ chế, không phải lời dặn.",
-      "Chỉ khớp `filename` thì hỏi người học thay vì tự kết luận — trước đó hai cuốn khác nhau cùng tên file sẽ khiến Nhánh G cập nhật con trỏ sang cuốn khác rồi giữ số liệu giám định cũ.",
-      "Phép kiểm kho chuyển lên trước khi gọi script.",
-      "Nhánh 'người học không biết cấu trúc': hỏi lại một lần, rồi mặc định `chuoi` với cờ `mac_dinh`.",
-      "Tên file thư có hậu tố thời gian — trước đó gửi lại cùng cuốn lần hai sẽ ghi đè thư cũ.",
-      "SKILL.md từ 7.967 xuống 5.054 token (đo bằng tiktoken/cl100k_base): tách `references/format.md` nạp khi tới bước ghi, và cắt các đoạn lý lẽ thiết kế sang Design Notes của story."
+      "Wrapped the engine in `bin/appraise.py`: the constraint 'never put book content into the context' turned from an instruction into a mechanism — `text` has no route out of the script. Locked down by `test_khoa_text_khong_bao_gio_ra_stdout`.",
+      "The three path checks moved into the script, and the two cases 'wrong path' / 'genuinely damaged copy' now return two different EXIT CODES — the boundary deciding whether a letter goes to another role is now a mechanism, not an instruction.",
+      "A `filename`-only match now asks the learner instead of concluding on its own — previously two different books sharing a filename would make Branch G repoint the pointer at the other book while keeping the old appraisal figures.",
+      "The hall check moved ahead of the script call.",
+      "The 'learner does not know the structure' branch: ask once more, then default to `chain` with the `default` flag.",
+      "Letter filenames carry a timestamp suffix — previously sending the same book a second time would overwrite the earlier letter.",
+      "SKILL.md went from 7,967 down to 5,054 tokens (measured with tiktoken/cl100k_base): split `references/format.md` out so it is loaded only when the writing step is reached, and moved the design-rationale passages into the story's Design Notes."
     ]
   },
   "rerun_round_batch_3c": {
     "date": "2026-08-31",
-    "why": "Toàn bộ plugin đổi tên và đổi khoá ở đợt A. Mọi evidence của các vòng trước dẫn lệnh `/van-dao:*` — lệnh đó không còn tồn tại, nên bằng chứng cũ đã lạc hậu. Không sửa tay transcript cũ: chạy lại là cách duy nhất trung thực.",
-    "result": "8/8 kịch bản chạy lại thật bằng claude -p --model sonnet, HOME cô lập, tất cả PASS.",
+    "why": "The whole plugin was renamed and rekeyed in batch A. All evidence from the earlier rounds cites the `/van-dao:*` command — that command no longer exists, so the old evidence is out of date. The old transcripts were not hand-edited: re-running is the only honest way.",
+    "result": "8/8 scenarios genuinely re-run with claude -p --model sonnet, isolated HOME, all PASS.",
     "evidence_new_keys_end_to_end": {
-      "hall_record": "phase=appraised · appraisal{cost_band=medium, structure=web, structure_source=learner_declared} · path · logged_at — đúng contract §2.6, ghi ra bởi một lượt chạy thật.",
-      "damaged_copy_letter": "from=scripture-hall · to=sect-master · kind=report_damaged_copy · counseled_scripture=\"\" · book_title · reason · status=waiting — cả bảy khoá đều là tên mới.",
-      "token_budget_threshold": "77.852 token được xếp `medium` theo đúng light=60000/heavy=150000 đọc từ customize.toml đã đổi khoá."
+      "hall_record": "phase=appraised · appraisal{cost_band=medium, structure=web, structure_source=learner_declared} · path · logged_at — matches contract §2.6, emitted by a real run.",
+      "damaged_copy_letter": "from=scripture-hall · to=sect-master · kind=report_damaged_copy · counseled_scripture=\"\" · book_title · reason · status=waiting — all seven keys are the new names.",
+      "token_budget_threshold": "77,852 tokens classified as `medium`, exactly per light=60000/heavy=150000 read from the rekeyed customize.toml."
     },
     "bug_found": {
-      "problem": "Xưng hô vai vế không dịch qua tiếng Anh được.",
-      "detail": "Bản gốc dặn 'gọi người học là con, tự xưng ta'. Bản dịch thành 'call the disciple child, refer to yourself as this master' — đúng nghĩa từng chữ. Nhưng chạy thật ra: 'Con đã chạy xong máy soi... con cần hỏi con một câu' — model dịch ngược cả hai vế thành 'con', sập phân biệt thầy-trò.",
-      "why_invariants_missed_it": "Bản dịch giữ nguyên 100% cấu trúc, giữ nguyên mọi cụm in đậm, khớp mọi mốc. check-invariants.py bắt MẤT MÁT, không bắt SAI NGHĨA — nó tự khai giới hạn đó, và đây là ca chứng minh giới hạn ấy có thật.",
-      "fix": "Bản tiếng Anh không dịch hai đại từ nữa mà giữ nguyên `con`/`ta`, kèm lý do để người sửa sau không dọn chúng đi.",
-      "fix_verified": "Chạy lại cùng lệnh: 'ta cần con trả lời một câu', 'Con định đọc cuốn này...' — đúng vai."
+      "problem": "Hierarchical forms of address do not survive translation into English.",
+      "detail": "The original said 'gọi người học là con, tự xưng ta'. The translation became 'call the disciple child, refer to yourself as this master' — word-for-word correct. But the real run produced: 'Con đã chạy xong máy soi... con cần hỏi con một câu' — the model translated both sides back into 'con', collapsing the master-disciple distinction.",
+      "why_invariants_missed_it": "The translation preserved 100% of the structure, kept every bold phrase, and matched every anchor. check-invariants.py catches LOSS, not WRONG MEANING — it declares that limit itself, and this is the case proving the limit is real.",
+      "fix": "The English version no longer translates the two pronouns but keeps `con`/`ta` as they are, with the reason attached so that a later editor does not tidy them away.",
+      "fix_verified": "Re-ran the same command: 'ta cần con trả lời một câu', 'Con định đọc cuốn này...' — the roles are correct."
     },
     "scenarios": [
       {
-        "matrix_row": "Engine chưa cài",
+        "matrix_row": "Engine not installed",
         "result": "PASS",
         "evidence": "status engine_not_installed mã 3; đưa `pip install -r requirements-dev.txt`; KHÔNG tự chạy lệnh cài (verify: venv trống vẫn ModuleNotFoundError sau lượt chạy); không ghi kho."
       },
       {
-        "matrix_row": "Sách rút được chữ, có mục lục",
+        "matrix_row": "Book extracts text, has a table of contents",
         "result": "PASS",
         "evidence": "58.389 từ, has_toc true, 13 chương; số trang kèm nhãn '23 spine_items — đơn vị riêng của epub, không phải trang in'; chi phí 77.852 token xếp mức trung bình."
       },
       {
-        "matrix_row": "Rút được chữ nhưng không có mục lục",
+        "matrix_row": "Text extracts but there is no table of contents",
         "result": "PASS",
         "evidence": "'0 chương — bản này không có mục lục... Đây không phải sách hỏng, chỉ là con sẽ phải tự chia đoạn ở bước sau.' Không thư nào được gửi."
       },
       {
-        "matrix_row": "Sách cấu trúc mạng",
+        "matrix_row": "Book with web structure",
         "result": "PASS",
         "evidence": "structure=web ghi vào kho; 'lộ trình sẽ xếp theo tình huống thực tế con hay vướng... không phải vì sách này có vấn đề' — đúng tinh thần xin thêm đầu vào chứ không chê sách."
       },
       {
-        "matrix_row": "Không rút được chữ",
+        "matrix_row": "No text can be extracted",
         "result": "PASS",
         "evidence": "Dừng, khuyên tìm bản khác, hỏi book_title và counseled_scripture thay vì đoán, rồi ghi thư the-art-of-war-202608310614.json với counseled_scripture rỗng. drafts/ không bị đụng."
       },
       {
-        "matrix_row": "Đường dẫn không trỏ tới một file dùng được",
+        "matrix_row": "The path does not point at a usable file",
         "result": "PASS",
         "evidence": "Thư mục tên thumuc.epub -> status not_a_file mã 1; 'không viết thư báo lỗi nào cả, vì đây không phải sách hỏng, mà là đường dẫn chưa đúng'; find trên .wayfarer trả rỗng."
       },
       {
-        "matrix_row": "Thu lại cuốn đã có trong kho",
+        "matrix_row": "Re-intaking a book already in the hall",
         "result": "PASS",
         "evidence": "Nhận ra trùng, trình lại bản ghi cũ, kho vẫn đúng 1 file. Tự xử lý được cả chuyện Windows rút gọn HBLAB_OPMS thành HBLAB_~1 trong đường dẫn."
       },
       {
-        "matrix_row": "Con trỏ trong kho trỏ tới file đã dời chỗ",
+        "matrix_row": "The pointer in the hall points at a file that has moved",
         "result": "PASS",
         "evidence": "Hỏi 'cùng quyển hay quyển khác trùng tên' thay vì đoán; sau xác nhận thì path đổi sang /Tai-ve/, words 58389 và logged_at gốc giữ nguyên, không bản ghi thứ hai, không thư."
       }
