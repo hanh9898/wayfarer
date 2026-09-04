@@ -28,7 +28,7 @@
       "expectations": [
         {
           "text": "States plainly that the engine is not installed, and gives the correct install command WITH the concrete plugin root path (not a vague phrase like \"the source root\").",
-          "evidence": "Session b6f24d80-3a17-4e59-8c02-51fd9a73e6b4: \"Con, engine đọc sách (`book_to_skill`) chưa được cài trên máy này — chạy script giám định thì báo lỗi thiếu module, chưa động tới được nội dung file `art-of-war.epub`.\\n\\nLệnh cần chạy để cài, từ thư mục gốc của plugin (`C:\\\\Users\\\\HBLAB_OPMS\\\\Projects\\\\van-dao-workspace\\\\van-dao`):\\n\\n```\\npip install -r requirements-dev.txt\\n```\" — skill tự tra ra đường dẫn thật, không đọc thuộc lòng."
+          "evidence": "Session b6f24d80-3a17-4e59-8c02-51fd9a73e6b4: \"Con, engine đọc sách (`book_to_skill`) chưa được cài trên máy này — chạy script giám định thì báo lỗi thiếu module, chưa động tới được nội dung file `art-of-war.epub`.\\n\\nLệnh cần chạy để cài, từ thư mục gốc của plugin (`C:\\\\Users\\\\<user>\\\\Projects\\\\van-dao-workspace\\\\van-dao`):\\n\\n```\\npip install -r requirements-dev.txt\\n```\" — skill tự tra ra đường dẫn thật, không đọc thuộc lòng."
         },
         {
           "text": "Does not run the install command itself.",
@@ -295,7 +295,7 @@
       {
         "matrix_row": "Re-intaking a book already in the hall",
         "result": "PASS",
-        "evidence": "Nhận ra trùng, trình lại bản ghi cũ, kho vẫn đúng 1 file. Tự xử lý được cả chuyện Windows rút gọn HBLAB_OPMS thành HBLAB_~1 trong đường dẫn."
+        "evidence": "Nhận ra trùng, trình lại bản ghi cũ, kho vẫn đúng 1 file. Tự xử lý được cả chuyện Windows rút gọn <user> thành <user> trong đường dẫn."
       },
       {
         "matrix_row": "The pointer in the hall points at a file that has moved",
